@@ -1,0 +1,20 @@
+---
+title: "Taxonomia de metagenomas usando Kraken"
+author: "OMICs Analysis"
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    theme: yeti
+    toc-location: left-body
+    smooth-scroll: true
+    toc-title: "Contenido"
+editor: visual
+execute:
+  engine: knitr
+lang: es
+---
+
+![](images/logo_OAN_for_white.png){fig-align="center" width="300"}
+
+## 
