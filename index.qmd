@@ -199,7 +199,7 @@ Advertencia ⚠️. Según tus capacidades computacionales puedes utilizar bases
 </table>
 ```
 
-Para este tutorial vamos a trabajar con la base de datos indexada `MinusB` y `Standard-16`. Como datos de metagenoma vamos a utilizar los que previamente habiamos trimeado y filtrado de contaminación de hospedero.
+Para este tutorial vamos a trabajar con la base de datos indexada `MinusB` (enfocada en bacterias y arqueas, más ligera) y `Standard-16` (más completa, incluyendo eucariotas, pero requiere más memoria). Como datos de metagenoma vamos a utilizar los que previamente habiamos trimeado y filtrado de contaminación de hospedero.
 
 | SRA ID | Condición | Etapa de crecimiento |
 |------------------------|------------------------|------------------------|
@@ -238,7 +238,19 @@ tar -xzf k2_standard_16_GB_20250714.tar.gz
 
 # Kraken2
 
-Para este punto es conveniente tener las secuencias pareadas en un solo archivo concatenado FASTQ. En caso de que tengas tus archivos en dos archivos separados fwd y rev, puedes preprocesarlos usando `kraken --paired`.
+`Kraken2` es una herramienta bioinformática rápida y precisa para clasificar secuencias de ADN de muestras metagenómicas (como las de microbiomas) en categorías taxonómicas, como bacterias, virus, arqueas o eucariotas. Es ampliamente usada en estudios de microbiología y ecología para identificar "quién está ahí" en una mezcla de organismos.
+
+**Cómo funciona de manera simple**:
+
+-   **Construcción de la base de datos**: Kraken2 crea un índice (database) a partir de genomas de referencia (como los que descargaste: minusb para bacterias y arqueas, o standard para una cobertura más amplia). Divide los genomas en "k-mers" (subsecuencias cortas de longitud fija, por ejemplo, 31 bases). Cada k-mer se asocia al ancestro común más bajo (LCA, por sus siglas en inglés) de los taxones que lo comparten, para manejar ambigüedades.
+
+-   **Clasificación de reads**: Para tus archivos FASTQ (secuencias de lecturas), Kraken2 divide cada read en k-mers y los busca en la base de datos. Cuenta los "hits" (coincidencias) para diferentes taxones y asigna el read al taxón con el mejor puntaje (basado en la raíz del árbol taxonómico). Si no hay coincidencias, el read se marca como "no clasificado".
+
+-   **Ventajas**: Es muy rápido (usa hashing para búsquedas eficientes) y maneja datos paired-end como los tuyos. Puedes ajustar parámetros como la confianza (--confidence) para mayor precisión.
+
+-   **Limitaciones**: Depende de la calidad de la base de datos; si un organismo no está en ella, no se detectará.
+
+Para este punto es conveniente tener las secuencias pareadas en un solo archivo concatenado FASTQ. En caso de que tengas tus archivos en dos archivos separados `fwd` y `rev`, puedes preprocesarlos usando `kraken --paired`.
 
 Explicación breve de opciones usadas:
 
@@ -305,3 +317,65 @@ Resultado:
   9536390 sequences classified (29.04%)
   23306540 sequences unclassified (70.96%)
 ```
+
+Escoger la base de datos adecuada influye drasticamente en la clasificación de las lecturas.
+
+## Output Kraken2
+
+`Kraken2` nos arroja como `output` los siguientes archivos:
+
+Cuando corres los comandos que te pasé, obtienes **cuatro tipos principales de archivos por base de datos**:
+
+###  `kraken2_output_*.tsv`
+
+-   Contiene una línea **por cada lectura**.
+
+    Columnas típicas:
+
+    1.  C/U → si fue clasificada (C) o no (U).
+
+    2.  Read ID.
+
+    3.  TaxID asignado.
+
+    4.  Longitud de la secuencia.
+
+    5.  K-mers clasificados / asignaciones.
+
+-   Útil si quieres rastrear lecturas individuales, pero **no es práctico para gráficos de composición**.
+
+###  `kraken2_report_*.txt`
+
+-   Es el archivo **más importante para resúmenes**.
+
+    Contiene la composición taxonómica del metagenoma en forma de tabla jerárquica.
+
+    Columnas típicas:
+
+    1.  **% de lecturas** asignadas a ese taxón (incluyendo descendientes).
+
+    2.  lecturas asignadas directamente a ese taxón.
+
+    3.  lecturas totales (taxón + descendientes).
+
+    4.  TaxID.
+
+    5.  Nivel taxonómico (U = root, D = dominio, P = filo, C = clase, O = orden, F = familia, G = género, S = especie, etc.).
+
+    6.  Nombre del taxón.
+
+-   Este archivo **sirve como entrada ideal** para hacer gráficos de barras apiladas (ejemplo: abundancias relativas por filo o por género).
+
+-   Si después usas **Bracken**, este mismo archivo puede refinarse para obtener abundancias corregidas.
+
+### `kraken2_classified_*.fq`
+
+-   Contiene las lecturas que **sí fueron clasificadas** por Kraken2, separadas en pares (`_1.fq` y `_2.fq`).
+
+Útil si quieres analizar solo la fracción clasificada (ej. ensamblaje por taxón específico).
+
+### `kraken2_unclassified_*.fq`
+
+-   Contiene las lecturas que **no pudieron clasificarse** (no coincidieron con la base de datos).
+
+-   Útil si quieres estudiar la “parte desconocida” del metagenoma o reanalizar con otra base de datos.

@@ -89,6 +89,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#minusb" id="toc-minusb" class="nav-link" data-scroll-target="#minusb">MinusB</a></li>
   <li><a href="#standard-16gb" id="toc-standard-16gb" class="nav-link" data-scroll-target="#standard-16gb">Standard 16GB</a></li>
+  <li><a href="#output-kraken2" id="toc-output-kraken2" class="nav-link" data-scroll-target="#output-kraken2">Output Kraken2</a>
+  <ul class="collapse">
+  <li><a href="#kraken2_output_.tsv" id="toc-kraken2_output_.tsv" class="nav-link" data-scroll-target="#kraken2_output_.tsv"><code>kraken2_output_*.tsv</code></a></li>
+  <li><a href="#kraken2_report_.txt" id="toc-kraken2_report_.txt" class="nav-link" data-scroll-target="#kraken2_report_.txt"><code>kraken2_report_*.txt</code></a></li>
+  <li><a href="#kraken2_classified_.fq" id="toc-kraken2_classified_.fq" class="nav-link" data-scroll-target="#kraken2_classified_.fq"><code>kraken2_classified_*.fq</code></a></li>
+  <li><a href="#kraken2_unclassified_.fq" id="toc-kraken2_unclassified_.fq" class="nav-link" data-scroll-target="#kraken2_unclassified_.fq"><code>kraken2_unclassified_*.fq</code></a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -133,6 +140,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#minusb" id="toc-minusb">MinusB</a></li>
   <li><a href="#standard-16gb" id="toc-standard-16gb">Standard 16GB</a></li>
+  <li><a href="#output-kraken2" id="toc-output-kraken2">Output Kraken2</a>
+  <ul>
+  <li><a href="#kraken2_output_.tsv" id="toc-kraken2_output_.tsv"><code>kraken2_output_*.tsv</code></a></li>
+  <li><a href="#kraken2_report_.txt" id="toc-kraken2_report_.txt"><code>kraken2_report_*.txt</code></a></li>
+  <li><a href="#kraken2_classified_.fq" id="toc-kraken2_classified_.fq"><code>kraken2_classified_*.fq</code></a></li>
+  <li><a href="#kraken2_unclassified_.fq" id="toc-kraken2_unclassified_.fq"><code>kraken2_unclassified_*.fq</code></a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -317,7 +331,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>Para este tutorial vamos a trabajar con la base de datos indexada <code>MinusB</code> y <code>Standard-16</code>. Como datos de metagenoma vamos a utilizar los que previamente habiamos trimeado y filtrado de contaminación de hospedero.</p>
+<p>Para este tutorial vamos a trabajar con la base de datos indexada <code>MinusB</code> (enfocada en bacterias y arqueas, más ligera) y <code>Standard-16</code> (más completa, incluyendo eucariotas, pero requiere más memoria). Como datos de metagenoma vamos a utilizar los que previamente habiamos trimeado y filtrado de contaminación de hospedero.</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -385,7 +399,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="kraken2" class="level1">
 <h1>Kraken2</h1>
-<p>Para este punto es conveniente tener las secuencias pareadas en un solo archivo concatenado FASTQ. En caso de que tengas tus archivos en dos archivos separados fwd y rev, puedes preprocesarlos usando <code>kraken --paired</code>.</p>
+<p><code>Kraken2</code> es una herramienta bioinformática rápida y precisa para clasificar secuencias de ADN de muestras metagenómicas (como las de microbiomas) en categorías taxonómicas, como bacterias, virus, arqueas o eucariotas. Es ampliamente usada en estudios de microbiología y ecología para identificar “quién está ahí” en una mezcla de organismos.</p>
+<p><strong>Cómo funciona de manera simple</strong>:</p>
+<ul>
+<li><p><strong>Construcción de la base de datos</strong>: Kraken2 crea un índice (database) a partir de genomas de referencia (como los que descargaste: minusb para bacterias y arqueas, o standard para una cobertura más amplia). Divide los genomas en “k-mers” (subsecuencias cortas de longitud fija, por ejemplo, 31 bases). Cada k-mer se asocia al ancestro común más bajo (LCA, por sus siglas en inglés) de los taxones que lo comparten, para manejar ambigüedades.</p></li>
+<li><p><strong>Clasificación de reads</strong>: Para tus archivos FASTQ (secuencias de lecturas), Kraken2 divide cada read en k-mers y los busca en la base de datos. Cuenta los “hits” (coincidencias) para diferentes taxones y asigna el read al taxón con el mejor puntaje (basado en la raíz del árbol taxonómico). Si no hay coincidencias, el read se marca como “no clasificado”.</p></li>
+<li><p><strong>Ventajas</strong>: Es muy rápido (usa hashing para búsquedas eficientes) y maneja datos paired-end como los tuyos. Puedes ajustar parámetros como la confianza (–confidence) para mayor precisión.</p></li>
+<li><p><strong>Limitaciones</strong>: Depende de la calidad de la base de datos; si un organismo no está en ella, no se detectará.</p></li>
+</ul>
+<p>Para este punto es conveniente tener las secuencias pareadas en un solo archivo concatenado FASTQ. En caso de que tengas tus archivos en dos archivos separados <code>fwd</code> y <code>rev</code>, puedes preprocesarlos usando <code>kraken --paired</code>.</p>
 <p>Explicación breve de opciones usadas:</p>
 <ul>
 <li><p><code>--paired</code> : entrada paired-end.</p></li>
@@ -439,6 +461,59 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">9536390</span> sequences classified <span class="er">(</span><span class="ex">29.04%</span><span class="kw">)</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">23306540</span> sequences unclassified <span class="er">(</span><span class="ex">70.96%</span><span class="kw">)</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Escoger la base de datos adecuada influye drasticamente en la clasificación de las lecturas.</p>
+</section>
+<section id="output-kraken2" class="level2">
+<h2 class="anchored" data-anchor-id="output-kraken2">Output Kraken2</h2>
+<p><code>Kraken2</code> nos arroja como <code>output</code> los siguientes archivos:</p>
+<p>Cuando corres los comandos que te pasé, obtienes <strong>cuatro tipos principales de archivos por base de datos</strong>:</p>
+<section id="kraken2_output_.tsv" class="level3">
+<h3 class="anchored" data-anchor-id="kraken2_output_.tsv"><code>kraken2_output_*.tsv</code></h3>
+<ul>
+<li><p>Contiene una línea <strong>por cada lectura</strong>.</p>
+<p>Columnas típicas:</p>
+<ol type="1">
+<li><p>C/U → si fue clasificada (C) o no (U).</p></li>
+<li><p>Read ID.</p></li>
+<li><p>TaxID asignado.</p></li>
+<li><p>Longitud de la secuencia.</p></li>
+<li><p>K-mers clasificados / asignaciones.</p></li>
+</ol></li>
+<li><p>Útil si quieres rastrear lecturas individuales, pero <strong>no es práctico para gráficos de composición</strong>.</p></li>
+</ul>
+</section>
+<section id="kraken2_report_.txt" class="level3">
+<h3 class="anchored" data-anchor-id="kraken2_report_.txt"><code>kraken2_report_*.txt</code></h3>
+<ul>
+<li><p>Es el archivo <strong>más importante para resúmenes</strong>.</p>
+<p>Contiene la composición taxonómica del metagenoma en forma de tabla jerárquica.</p>
+<p>Columnas típicas:</p>
+<ol type="1">
+<li><p><strong>% de lecturas</strong> asignadas a ese taxón (incluyendo descendientes).</p></li>
+<li><p>lecturas asignadas directamente a ese taxón.</p></li>
+<li><p>lecturas totales (taxón + descendientes).</p></li>
+<li><p>TaxID.</p></li>
+<li><p>Nivel taxonómico (U = root, D = dominio, P = filo, C = clase, O = orden, F = familia, G = género, S = especie, etc.).</p></li>
+<li><p>Nombre del taxón.</p></li>
+</ol></li>
+<li><p>Este archivo <strong>sirve como entrada ideal</strong> para hacer gráficos de barras apiladas (ejemplo: abundancias relativas por filo o por género).</p></li>
+<li><p>Si después usas <strong>Bracken</strong>, este mismo archivo puede refinarse para obtener abundancias corregidas.</p></li>
+</ul>
+</section>
+<section id="kraken2_classified_.fq" class="level3">
+<h3 class="anchored" data-anchor-id="kraken2_classified_.fq"><code>kraken2_classified_*.fq</code></h3>
+<ul>
+<li>Contiene las lecturas que <strong>sí fueron clasificadas</strong> por Kraken2, separadas en pares (<code>_1.fq</code> y <code>_2.fq</code>).</li>
+</ul>
+<p>Útil si quieres analizar solo la fracción clasificada (ej. ensamblaje por taxón específico).</p>
+</section>
+<section id="kraken2_unclassified_.fq" class="level3">
+<h3 class="anchored" data-anchor-id="kraken2_unclassified_.fq"><code>kraken2_unclassified_*.fq</code></h3>
+<ul>
+<li><p>Contiene las lecturas que <strong>no pudieron clasificarse</strong> (no coincidieron con la base de datos).</p></li>
+<li><p>Útil si quieres estudiar la “parte desconocida” del metagenoma o reanalizar con otra base de datos.</p></li>
+</ul>
+</section>
 </section>
 </section>
 
