@@ -379,3 +379,69 @@ Cuando corres los comandos que te pasé, obtienes **cuatro tipos principales de 
 -   Contiene las lecturas que **no pudieron clasificarse** (no coincidieron con la base de datos).
 
 -   Útil si quieres estudiar la “parte desconocida” del metagenoma o reanalizar con otra base de datos.
+
+## Visualización del Perfil Taxonómico
+
+```{r, message=FALSE, warning=FALSE}
+# Instalar paquetes si no los tienes
+# install.packages(c("tidyverse"))
+
+library(tidyverse)
+
+#Lista tus archivos Kraken2 report
+# Ajusta la ruta donde guardaste los reportes
+report_files <- list.files(
+  path = "reports",
+  pattern = "kraken2_report_.*\\.txt$",
+  full.names = TRUE
+)
+
+
+# Función para leer un reporte y extraer nivel taxonómico deseado
+read_kraken_report <- function(file, rank = "P") {
+  # rank: D=Domain, P=Phylum, C=Class, O=Order, F=Family, G=Genus, S=Species
+  df <- read.table(file, sep = "\t", header = FALSE, quote = "", comment.char = "", fill = TRUE)
+  
+  colnames(df) <- c("percent", "reads_clade", "reads_direct", "rank_code", "ncbi_taxid", "name")
+  
+  df$name <- trimws(df$name)
+  
+  df <- df %>% filter(rank_code == rank)
+  
+  # Agregar columna con nombre de la muestra (a partir del archivo)
+  sample_id <- basename(file) %>% str_remove("^kraken2_report_") %>% str_remove("\\.txt$")
+  df$sample <- sample_id
+  
+  return(df)
+}
+
+# Leer todos los reportes
+all_reports <- map_dfr(report_files, read_kraken_report, rank = "P")  # "P" = Phylum
+
+
+# Normalizar datos para gráfico
+# Tomamos % directamente de Kraken2 (ya está normalizado)
+plot_data <- all_reports %>%
+  select(sample, name, percent)
+
+plot_data <- plot_data %>% 
+  filter(percent > 0)
+
+
+# Graficar barras apiladas
+
+ggplot(plot_data, aes(x = sample, y = percent, fill = name)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Perfil taxonómico (Kraken2)",
+    x = "Muestra",
+    y = "Abundancia relativa (%)",
+    fill = "Phylum"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid = element_blank()
+  )
+
+```

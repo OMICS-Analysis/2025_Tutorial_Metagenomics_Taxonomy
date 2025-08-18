@@ -96,6 +96,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#kraken2_classified_.fq" id="toc-kraken2_classified_.fq" class="nav-link" data-scroll-target="#kraken2_classified_.fq"><code>kraken2_classified_*.fq</code></a></li>
   <li><a href="#kraken2_unclassified_.fq" id="toc-kraken2_unclassified_.fq" class="nav-link" data-scroll-target="#kraken2_unclassified_.fq"><code>kraken2_unclassified_*.fq</code></a></li>
   </ul></li>
+  <li><a href="#visualización-del-perfil-taxonómico" id="toc-visualización-del-perfil-taxonómico" class="nav-link" data-scroll-target="#visualización-del-perfil-taxonómico">Visualización del Perfil Taxonómico</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -147,6 +148,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#kraken2_classified_.fq" id="toc-kraken2_classified_.fq"><code>kraken2_classified_*.fq</code></a></li>
   <li><a href="#kraken2_unclassified_.fq" id="toc-kraken2_unclassified_.fq"><code>kraken2_unclassified_*.fq</code></a></li>
   </ul></li>
+  <li><a href="#visualización-del-perfil-taxonómico" id="toc-visualización-del-perfil-taxonómico">Visualización del Perfil Taxonómico</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -514,6 +516,78 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>Útil si quieres estudiar la “parte desconocida” del metagenoma o reanalizar con otra base de datos.</p></li>
 </ul>
 </section>
+</section>
+<section id="visualización-del-perfil-taxonómico" class="level2">
+<h2 class="anchored" data-anchor-id="visualización-del-perfil-taxonómico">Visualización del Perfil Taxonómico</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Instalar paquetes si no los tienes</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("tidyverse"))</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Lista tus archivos Kraken2 report</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Ajusta la ruta donde guardaste los reportes</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>report_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">path =</span> <span class="st">"reports"</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">pattern =</span> <span class="st">"kraken2_report_.*</span><span class="sc">\\</span><span class="st">.txt$"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">full.names =</span> <span class="cn">TRUE</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Función para leer un reporte y extraer nivel taxonómico deseado</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>read_kraken_report <span class="ot">&lt;-</span> <span class="cf">function</span>(file, <span class="at">rank =</span> <span class="st">"P"</span>) {</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rank: D=Domain, P=Phylum, C=Class, O=Order, F=Family, G=Genus, S=Species</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">read.table</span>(file, <span class="at">sep =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>, <span class="at">header =</span> <span class="cn">FALSE</span>, <span class="at">quote =</span> <span class="st">""</span>, <span class="at">comment.char =</span> <span class="st">""</span>, <span class="at">fill =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"percent"</span>, <span class="st">"reads_clade"</span>, <span class="st">"reads_direct"</span>, <span class="st">"rank_code"</span>, <span class="st">"ncbi_taxid"</span>, <span class="st">"name"</span>)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>name <span class="ot">&lt;-</span> <span class="fu">trimws</span>(df<span class="sc">$</span>name)</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(rank_code <span class="sc">==</span> rank)</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Agregar columna con nombre de la muestra (a partir del archivo)</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  sample_id <span class="ot">&lt;-</span> <span class="fu">basename</span>(file) <span class="sc">%&gt;%</span> <span class="fu">str_remove</span>(<span class="st">"^kraken2_report_"</span>) <span class="sc">%&gt;%</span> <span class="fu">str_remove</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">.txt$"</span>)</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>sample <span class="ot">&lt;-</span> sample_id</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Leer todos los reportes</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>all_reports <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(report_files, read_kraken_report, <span class="at">rank =</span> <span class="st">"P"</span>)  <span class="co"># "P" = Phylum</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Normalizar datos para gráfico</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Tomamos % directamente de Kraken2 (ya está normalizado)</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> all_reports <span class="sc">%&gt;%</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sample, name, percent)</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> plot_data <span class="sc">%&gt;%</span> </span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(percent <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Graficar barras apiladas</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data, <span class="fu">aes</span>(<span class="at">x =</span> sample, <span class="at">y =</span> percent, <span class="at">fill =</span> name)) <span class="sc">+</span></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Perfil taxonómico (Kraken2)"</span>,</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Muestra"</span>,</span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Abundancia relativa (%)"</span>,</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Phylum"</span></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 </section>
 
