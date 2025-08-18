@@ -1,5 +1,5 @@
 ---
-title: "Taxonomia de metagenomas usando Kraken"
+title: "Perfil Taxonómico de metagenomas usando Kraken"
 author: "OMICs Analysis"
 format: 
   html:
@@ -17,4 +17,207 @@ lang: es
 
 ![](images/logo_OAN_for_white.png){fig-align="center" width="300"}
 
-## 
+# Introducción
+
+Vamos a utilizar `Kraken v2`, lo puedes descragar [aquí](https://ccb.jhu.edu/software/kraken/MANUAL.html).
+
+Advertencia ⚠️. Según tus capacidades computacionales puedes utilizar bases de datos más grandes para clasificar, **entre mayor tamaño mayor cantidad de memoría `RAM` necesitarás**. Aquí te dejo algunas disponibles, puedes ver más a detalle de su indexación y la gran variedad de bases de datos que ya existen [aquí](https://benlangmead.github.io/aws-indexes/k2):
+
+```{=html}
+<table>
+  <thead>
+    <tr>
+      <th>Colección</th>
+      <th>Contenido</th>
+      <th>Fecha</th>
+      <th style="text-align: right">Tamaño de archivo (GB)</th>
+      <th style="text-align: right">Tamaño Index (GB)</th>
+      <th>HTTPS URL</th>
+      <th>Inspeccionar</th>
+      <th>Librería</th>
+      <th>MD5</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Viral</td>
+      <td>Refseq viral</td>
+      <td>7/14/2025</td>
+      <td style="text-align: right">0.5</td>
+      <td style="text-align: right">0.6</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_viral_20250714.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/viral_20250714/inspect.txt">.txt</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/viral_20250714/library_report.tsv">.tsv</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/viral_20250714/viral.md5">.md5</a></td>
+    </tr>
+    <tr>
+      <td>MinusB</td>
+      <td>Refseq archaea, viral, plasmid, human<sup>1</sup>, UniVec_Core</td>
+      <td>7/14/2025</td>
+      <td style="text-align: right">7.7</td>
+      <td style="text-align: right">10.8</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_minusb_20250714.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/minusb_20250714/inspect.txt">.txt</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/minusb_20250714/library_report.tsv">.tsv</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/minusb_20250714/minusb.md5">.md5</a></td>
+    </tr>
+    <tr>
+      <td>Standard</td>
+      <td>Refseq archaea, bacteria, viral, plasmid, human<sup>1</sup>, UniVec_Core</td>
+      <td>7/14/2025</td>
+      <td style="text-align: right">70.8</td>
+      <td style="text-align: right">91.8</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_standard_20250714.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/standard_20250714/inspect.txt">.txt</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/standard_20250714/library_report.tsv">.tsv</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/standard_20250714/standard.md5">.md5</a></td>
+    </tr>
+    <tr>
+      <td>Standard-8</td>
+      <td>Standard with DB capped at 8 GB</td>
+      <td>7/14/2025</td>
+      <td style="text-align: right">5.5</td>
+      <td style="text-align: right">7.5</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_standard_08_GB_20250714.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/standard_08_GB_20250714/inspect.txt">.txt</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/standard_08_GB_20250714/library_report.tsv">.tsv</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/standard_08_GB_20250714/standard_08_GB.md5">.md5</a></td>
+    </tr>
+    <tr>
+      <td>Standard-16</td>
+      <td>Standard with DB capped at 16 GB</td>
+      <td>7/14/2025</td>
+      <td style="text-align: right">11.2</td>
+      <td style="text-align: right">14.9</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_standard_16_GB_20250714.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/standard_16_GB_20250714/inspect.txt">.txt</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/standard_16_GB_20250714/library_report.tsv">.tsv</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/standard_16_GB_20250714/standard_16_GB.md5">.md5</a></td>
+    </tr>
+    <tr>
+      <td>PlusPF</td>
+      <td>Standard plus Refseq protozoa &amp; fungi</td>
+      <td>7/14/2025</td>
+      <td style="text-align: right">75.9</td>
+      <td style="text-align: right">98.4</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_pluspf_20250714.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspf_20250714/inspect.txt">.txt</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspf_20250714/library_report.tsv">.tsv</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspf_20250714/pluspf.md5">.md5</a></td>
+    </tr>
+    <tr>
+      <td>PlusPF-8</td>
+      <td>PlusPF with DB capped at 8 GB</td>
+      <td>7/14/2025</td>
+      <td style="text-align: right">5.5</td>
+      <td style="text-align: right">7.5</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_pluspf_08_GB_20250714.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspf_08_GB_20250714/inspect.txt">.txt</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspf_08_GB_20250714/library_report.tsv">.tsv</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspf_08_GB_20250714/pluspf_08_GB.md5">.md5</a></td>
+    </tr>
+    <tr>
+      <td>PlusPF-16</td>
+      <td>PlusPF with DB capped at 16 GB</td>
+      <td>7/14/2025</td>
+      <td style="text-align: right">11.2</td>
+      <td style="text-align: right">14.9</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_pluspf_16_GB_20250714.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspf_16_GB_20250714/inspect.txt">.txt</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspf_16_GB_20250714/library_report.tsv">.tsv</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspf_16_GB_20250714/pluspf_16_GB.md5">.md5</a></td>
+    </tr>
+    <tr>
+      <td>PlusPFP</td>
+      <td>Standard plus Refseq protozoa, fungi &amp; plant</td>
+      <td>7/14/2025</td>
+      <td style="text-align: right">155.7</td>
+      <td style="text-align: right">210.6</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_pluspfp_20250714.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspfp_20250714/inspect.txt">.txt</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspfp_20250714/library_report.tsv">.tsv</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspfp_20250714/pluspfp.md5">.md5</a></td>
+    </tr>
+    <tr>
+      <td>PlusPFP-8</td>
+      <td>PlusPFP with DB capped at 8 GB</td>
+      <td>7/14/2025</td>
+      <td style="text-align: right">5.2</td>
+      <td style="text-align: right">7.5</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_pluspfp_08_GB_20250714.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspfp_08_GB_20250714/inspect.txt">.txt</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspfp_08_GB_20250714/library_report.tsv">.tsv</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspfp_08_GB_20250714/pluspfp_08_GB.md5">.md5</a></td>
+    </tr>
+    <tr>
+      <td>PlusPFP-16</td>
+      <td>PlusPFP with DB capped at 16 GB</td>
+      <td>7/14/2025</td>
+      <td style="text-align: right">10.5</td>
+      <td style="text-align: right">14.9</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_pluspfp_16_GB_20250714.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspfp_16_GB_20250714/inspect.txt">.txt</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspfp_16_GB_20250714/library_report.tsv">.tsv</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/pluspfp_16_GB_20250714/pluspfp_16_GB.md5">.md5</a></td>
+    </tr>
+    <tr>
+      <td>EuPathDB46<sup>2</sup></td>
+      <td>Eukaryotic pathogen genomes with contaminants removed</td>
+      <td>4/18/2023</td>
+      <td style="text-align: right">8.4</td>
+      <td style="text-align: right">11</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_eupathdb48_20230407.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_eupathdb48_20230407/kraken2inspect_output.txt">.txt</a></td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>core_nt Database</td>
+      <td>Very large collection, inclusive of GenBank, RefSeq, TPA and PDB</td>
+      <td>6/9/2025</td>
+      <td style="text-align: right">183.0</td>
+      <td style="text-align: right">238.2</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_core_nt_20250609.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/core_nt_20250609/inspect.txt">.txt</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/core_nt_20250609/library_report.tsv">.tsv</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/core_nt_20250609/core_nt.md5">.md5</a></td>
+    </tr>
+    <tr>
+      <td>GTDB v226 (<code class="language-plaintext highlighter-rouge">genomic_files_reps</code>)</td>
+      <td>Bacterial and archaeal</td>
+      <td>6/9/2025</td>
+      <td style="text-align: right">500.9</td>
+      <td style="text-align: right">644.0</td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/k2_gtdb_genome_reps_20250609.tar.gz">.tar.gz</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/gtdb_genome_reps_20250609/inspect.txt">.txt</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/gtdb_genome_reps_20250609/library_report.tsv">.tsv</a></td>
+      <td><a href="https://genome-idx.s3.amazonaws.com/kraken/gtdb_genome_reps_20250609/gtdb_genome_reps.md5">.md5</a></td>
+    </tr>
+  </tbody>
+</table>
+```
+
+Para este tutorial vamos a trabajar con la base de datos indexada `MinusB` y `Standard-16`. Como datos de metagenoma vamos a utilizar los que previamente habiamos trimeado y filtrado de contaminación de hospedero.
+
+| SRA ID | Condición | Etapa de crecimiento |
+|------------------------|------------------------|------------------------|
+| [SRR19746212](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR19746212) | Periodo Normal | Novillas en crecimiento |
+| [SRR19746215](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR19746215) | Estrés Térmico | Novillas en crecimiento |
+| [SRR19746202](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR19746202) | Periodo Normal | Novillas |
+| [SRR19746205](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR19746205) | Estrés Térmico | Novillas |
+| [SRR19746208](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR19746208) | Periodo Normal | Vacas Lactantes |
+| [SRR19746219](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR19746219) | Estrés Térmico | Vacas Lactantes |
+
+Para este proceso vamos a generar un directorio llamado `2025_metagenomics_profile`
+
+```{bash, eval=FALSE}
+mkdir 2025_metagenomics_profile
+cd 2025_metagenomics_profile
+mkdir data
+cd data
+```
+
+```{bash, eval=FALSE}
+wget https://genome-idx.s3.amazonaws.com/kraken/k2_minusb_20250714.tar.gz
+wget https://genome-idx.s3.amazonaws.com/kraken/k2_standard_16_GB_20250714.tar.gz
+```
