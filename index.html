@@ -85,7 +85,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#preparación-de-base-de-datos-indexada" id="toc-preparación-de-base-de-datos-indexada" class="nav-link" data-scroll-target="#preparación-de-base-de-datos-indexada">Preparación de base de datos indexada</a></li>
   </ul></li>
-  <li><a href="#kraken2" id="toc-kraken2" class="nav-link" data-scroll-target="#kraken2">Kraken2</a></li>
+  <li><a href="#kraken2" id="toc-kraken2" class="nav-link" data-scroll-target="#kraken2">Kraken2</a>
+  <ul class="collapse">
+  <li><a href="#minusb" id="toc-minusb" class="nav-link" data-scroll-target="#minusb">MinusB</a></li>
+  <li><a href="#standard-16gb" id="toc-standard-16gb" class="nav-link" data-scroll-target="#standard-16gb">Standard 16GB</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -125,7 +129,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#preparación-de-base-de-datos-indexada" id="toc-preparación-de-base-de-datos-indexada">Preparación de base de datos indexada</a></li>
   </ul></li>
-  <li><a href="#kraken2" id="toc-kraken2">Kraken2</a></li>
+  <li><a href="#kraken2" id="toc-kraken2">Kraken2</a>
+  <ul>
+  <li><a href="#minusb" id="toc-minusb">MinusB</a></li>
+  <li><a href="#standard-16gb" id="toc-standard-16gb">Standard 16GB</a></li>
+  </ul></li>
   </ul>
 </nav>
 <div class="quarto-figure quarto-figure-center">
@@ -387,6 +395,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><code>--classified-out</code> / <code>--unclassified-out</code> : opcional, guarda reads clasificados/no clasificados (usar <code>#</code> para pares).</p></li>
 <li><p><code>--confidence</code> : opcional, umbral de confianza (ejemplo <code>0.1</code> si quieres mayor especificidad).</p></li>
 </ul>
+<section id="minusb" class="level2">
+<h2 class="anchored" data-anchor-id="minusb">MinusB</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="st">"./bin/kraken2/kraken2"</span> <span class="dt">\</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--db</span> <span class="st">"dbs/db_minusb"</span><span class="dt">\</span></span>
@@ -400,6 +410,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">--unclassified-out</span> <span class="st">"kraken2_unclassified_k2_minusb_20250714_#.fq"</span> <span class="dt">\</span></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1_QC/host_filter/SRR19746202_1.fastq.gz"</span> <span class="st">"1_QC/host_filter/SRR19746202_2.fastq.gz"</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Resultado:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">32842930</span> sequences <span class="er">(</span><span class="ex">9852.88</span> Mbp<span class="kw">)</span> <span class="ex">processed</span> in 751.006s <span class="er">(</span><span class="ex">2623.9</span> Kseq/m, 787.17 Mbp/m<span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">3196540</span> sequences classified <span class="er">(</span><span class="ex">9.73%</span><span class="kw">)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">29646390</span> sequences unclassified <span class="er">(</span><span class="ex">90.27%</span><span class="kw">)</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="standard-16gb" class="level2">
+<h2 class="anchored" data-anchor-id="standard-16gb">Standard 16GB</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="st">"./bin/kraken2/kraken2"</span> <span class="dt">\</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--db</span> <span class="st">"dbs/db_standard"</span><span class="dt">\</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--paired</span> <span class="dt">\</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--gzip-compressed</span> <span class="dt">\</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--threads</span> 7 <span class="dt">\</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--use-names</span> <span class="dt">\</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--report</span> <span class="st">"kraken2_report_k2_standard_20250714.txt"</span> <span class="dt">\</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output</span> <span class="st">"kraken2_output_k2_standard_20250714.tsv"</span> <span class="dt">\</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">--classified-out</span> <span class="st">"kraken2_classified_k2_standard_20250714_#.fq"</span> <span class="dt">\</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">--unclassified-out</span> <span class="st">"kraken2_unclassified_k2_standard_20250714_#.fq"</span> <span class="dt">\</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1_QC/host_filter/SRR19746202_1.fastq.gz"</span> <span class="st">"1_QC/host_filter/SRR19746202_2.fastq.gz"</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
 </section>
 
 </main>

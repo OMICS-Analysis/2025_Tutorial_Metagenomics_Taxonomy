@@ -254,6 +254,8 @@ Explicación breve de opciones usadas:
 
 -   `--confidence` : opcional, umbral de confianza (ejemplo `0.1` si quieres mayor especificidad).
 
+## MinusB
+
 ```{bash, eval=FALSE}
 "./bin/kraken2/kraken2" \
   --db "dbs/db_minusb"\
@@ -267,4 +269,29 @@ Explicación breve de opciones usadas:
   --unclassified-out "kraken2_unclassified_k2_minusb_20250714_#.fq" \
   "1_QC/host_filter/SRR19746202_1.fastq.gz" "1_QC/host_filter/SRR19746202_2.fastq.gz"
 
+```
+
+Resultado:
+
+```{bash, eval=FALSE}
+32842930 sequences (9852.88 Mbp) processed in 751.006s (2623.9 Kseq/m, 787.17 Mbp/m).
+  3196540 sequences classified (9.73%)
+  29646390 sequences unclassified (90.27%)
+
+```
+
+## Standard 16GB
+
+```{bash, eval=FALSE}
+"./bin/kraken2/kraken2" \
+  --db "dbs/db_standard"\
+  --paired \
+  --gzip-compressed \
+  --threads 7 \
+  --use-names \
+  --report "kraken2_report_k2_standard_20250714.txt" \
+  --output "kraken2_output_k2_standard_20250714.tsv" \
+  --classified-out "kraken2_classified_k2_standard_20250714_#.fq" \
+  --unclassified-out "kraken2_unclassified_k2_standard_20250714_#.fq" \
+  "1_QC/host_filter/SRR19746202_1.fastq.gz" "1_QC/host_filter/SRR19746202_2.fastq.gz"
 ```
