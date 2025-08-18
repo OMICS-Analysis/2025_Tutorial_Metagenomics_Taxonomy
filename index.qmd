@@ -208,16 +208,63 @@ Para este tutorial vamos a trabajar con la base de datos indexada `MinusB` y `St
 | [SRR19746208](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR19746208) | Periodo Normal | Vacas Lactantes |
 | [SRR19746219](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR19746219) | Estrés Térmico | Vacas Lactantes |
 
+## Preparación de base de datos indexada
+
 Para este proceso vamos a generar un directorio llamado `2025_metagenomics_profile`
 
 ```{bash, eval=FALSE}
 mkdir 2025_metagenomics_profile
 cd 2025_metagenomics_profile
-mkdir data
-cd data
+mkdir dbs
+cd dbs
 ```
 
 ```{bash, eval=FALSE}
+mkdir db_minusb
+cd db_minusb
 wget https://genome-idx.s3.amazonaws.com/kraken/k2_minusb_20250714.tar.gz
+tar -xzf k2_minusb_20250714.tar.gz
+```
+
+```{bash, eval=FALSE}
+cd ..
+mkdir db_standard
+cd db_standard
 wget https://genome-idx.s3.amazonaws.com/kraken/k2_standard_16_GB_20250714.tar.gz
+tar -xzf k2_standard_16_GB_20250714.tar.gz
+```
+
+# Kraken2
+
+Para este punto es conveniente tener las secuencias pareadas en un solo archivo concatenado FASTQ. En caso de que tengas tus archivos en dos archivos separados fwd y rev, puedes preprocesarlos usando `kraken --paired`.
+
+Explicación breve de opciones usadas:
+
+-   `--paired` : entrada paired-end.
+
+-   `--gzip-compressed` : tus fastq están gz.
+
+-   `--use-names` : muestra nombres taxonómicos legibles en el output.
+
+-   `--report` : resumen por taxón (ideal para downstream).
+
+-   `--output` : asignaciones por lectura (format columnas).
+
+-   `--classified-out` / `--unclassified-out` : opcional, guarda reads clasificados/no clasificados (usar `#` para pares).
+
+-   `--confidence` : opcional, umbral de confianza (ejemplo `0.1` si quieres mayor especificidad).
+
+```{bash, eval=FALSE}
+"./bin/kraken2/kraken2" \
+  --db "dbs/db_minusb"\
+  --paired \
+  --gzip-compressed \
+  --threads 7 \
+  --use-names \
+  --report "kraken2_report_k2_minusb_20250714.txt" \
+  --output "kraken2_output_k2_minusb_20250714.tsv" \
+  --classified-out "kraken2_classified_k2_minusb_20250714_#.fq" \
+  --unclassified-out "kraken2_unclassified_k2_minusb_20250714_#.fq" \
+  "1_QC/host_filter/SRR19746202_1.fastq.gz" "1_QC/host_filter/SRR19746202_2.fastq.gz"
+
 ```

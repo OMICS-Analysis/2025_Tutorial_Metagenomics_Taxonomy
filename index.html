@@ -81,7 +81,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Contenido</h2>
    
   <ul>
-  <li><a href="#introducción" id="toc-introducción" class="nav-link active" data-scroll-target="#introducción">Introducción</a></li>
+  <li><a href="#introducción" id="toc-introducción" class="nav-link active" data-scroll-target="#introducción">Introducción</a>
+  <ul class="collapse">
+  <li><a href="#preparación-de-base-de-datos-indexada" id="toc-preparación-de-base-de-datos-indexada" class="nav-link" data-scroll-target="#preparación-de-base-de-datos-indexada">Preparación de base de datos indexada</a></li>
+  </ul></li>
+  <li><a href="#kraken2" id="toc-kraken2" class="nav-link" data-scroll-target="#kraken2">Kraken2</a></li>
   </ul>
 </nav>
 </div>
@@ -117,7 +121,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Contenido</h2>
    
   <ul>
-  <li><a href="#introducción" id="toc-introducción">Introducción</a></li>
+  <li><a href="#introducción" id="toc-introducción">Introducción</a>
+  <ul>
+  <li><a href="#preparación-de-base-de-datos-indexada" id="toc-preparación-de-base-de-datos-indexada">Preparación de base de datos indexada</a></li>
+  </ul></li>
+  <li><a href="#kraken2" id="toc-kraken2">Kraken2</a></li>
   </ul>
 </nav>
 <div class="quarto-figure quarto-figure-center">
@@ -342,16 +350,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
+<section id="preparación-de-base-de-datos-indexada" class="level2">
+<h2 class="anchored" data-anchor-id="preparación-de-base-de-datos-indexada">Preparación de base de datos indexada</h2>
 <p>Para este proceso vamos a generar un directorio llamado <code>2025_metagenomics_profile</code></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> 2025_metagenomics_profile</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> 2025_metagenomics_profile</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> data</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> data</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> dbs</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> dbs</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://genome-idx.s3.amazonaws.com/kraken/k2_minusb_20250714.tar.gz</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://genome-idx.s3.amazonaws.com/kraken/k2_standard_16_GB_20250714.tar.gz</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> db_minusb</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> db_minusb</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://genome-idx.s3.amazonaws.com/kraken/k2_minusb_20250714.tar.gz</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-xzf</span> k2_minusb_20250714.tar.gz</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ..</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> db_standard</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> db_standard</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://genome-idx.s3.amazonaws.com/kraken/k2_standard_16_GB_20250714.tar.gz</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-xzf</span> k2_standard_16_GB_20250714.tar.gz</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="kraken2" class="level1">
+<h1>Kraken2</h1>
+<p>Para este punto es conveniente tener las secuencias pareadas en un solo archivo concatenado FASTQ. En caso de que tengas tus archivos en dos archivos separados fwd y rev, puedes preprocesarlos usando <code>kraken --paired</code>.</p>
+<p>Explicación breve de opciones usadas:</p>
+<ul>
+<li><p><code>--paired</code> : entrada paired-end.</p></li>
+<li><p><code>--gzip-compressed</code> : tus fastq están gz.</p></li>
+<li><p><code>--use-names</code> : muestra nombres taxonómicos legibles en el output.</p></li>
+<li><p><code>--report</code> : resumen por taxón (ideal para downstream).</p></li>
+<li><p><code>--output</code> : asignaciones por lectura (format columnas).</p></li>
+<li><p><code>--classified-out</code> / <code>--unclassified-out</code> : opcional, guarda reads clasificados/no clasificados (usar <code>#</code> para pares).</p></li>
+<li><p><code>--confidence</code> : opcional, umbral de confianza (ejemplo <code>0.1</code> si quieres mayor especificidad).</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="st">"./bin/kraken2/kraken2"</span> <span class="dt">\</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--db</span> <span class="st">"dbs/db_minusb"</span><span class="dt">\</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--paired</span> <span class="dt">\</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--gzip-compressed</span> <span class="dt">\</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--threads</span> 7 <span class="dt">\</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--use-names</span> <span class="dt">\</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--report</span> <span class="st">"kraken2_report_k2_minusb_20250714.txt"</span> <span class="dt">\</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output</span> <span class="st">"kraken2_output_k2_minusb_20250714.tsv"</span> <span class="dt">\</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">--classified-out</span> <span class="st">"kraken2_classified_k2_minusb_20250714_#.fq"</span> <span class="dt">\</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">--unclassified-out</span> <span class="st">"kraken2_unclassified_k2_minusb_20250714_#.fq"</span> <span class="dt">\</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1_QC/host_filter/SRR19746202_1.fastq.gz"</span> <span class="st">"1_QC/host_filter/SRR19746202_2.fastq.gz"</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 
