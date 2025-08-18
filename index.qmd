@@ -21,6 +21,8 @@ lang: es
 
 Vamos a utilizar `Kraken v2`, lo puedes descragar [aquí](https://ccb.jhu.edu/software/kraken/MANUAL.html).
 
+Este tutorial se hizo utilizando un equipo A`SUSTeK COMPUTER INC. G75VW` con procesador `Intel® Core™ i7-3610QM CPU @ 2.30GHz × 8`, `24 GB` de `RAM`.
+
 Advertencia ⚠️. Según tus capacidades computacionales puedes utilizar bases de datos más grandes para clasificar, **entre mayor tamaño mayor cantidad de memoría `RAM` necesitarás**. Aquí te dejo algunas disponibles, puedes ver más a detalle de su indexación y la gran variedad de bases de datos que ya existen [aquí](https://benlangmead.github.io/aws-indexes/k2):
 
 ```{=html}
@@ -294,4 +296,12 @@ Resultado:
   --classified-out "kraken2_classified_k2_standard_20250714_#.fq" \
   --unclassified-out "kraken2_unclassified_k2_standard_20250714_#.fq" \
   "1_QC/host_filter/SRR19746202_1.fastq.gz" "1_QC/host_filter/SRR19746202_2.fastq.gz"
+```
+
+Resultado:
+
+```{bash, eval=FALSE}
+32842930 sequences (9852.88 Mbp) processed in 581.113s (3391.0 Kseq/m, 1017.31 Mbp/m).
+  9536390 sequences classified (29.04%)
+  23306540 sequences unclassified (70.96%)
 ```

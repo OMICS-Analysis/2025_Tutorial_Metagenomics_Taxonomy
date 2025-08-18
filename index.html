@@ -144,6 +144,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="introducción" class="level1">
 <h1>Introducción</h1>
 <p>Vamos a utilizar <code>Kraken v2</code>, lo puedes descragar <a href="https://ccb.jhu.edu/software/kraken/MANUAL.html">aquí</a>.</p>
+<p>Este tutorial se hizo utilizando un equipo A<code>SUSTeK COMPUTER INC. G75VW</code> con procesador <code>Intel® Core™ i7-3610QM CPU @ 2.30GHz × 8</code>, <code>24 GB</code> de <code>RAM</code>.</p>
 <p>Advertencia ⚠️. Según tus capacidades computacionales puedes utilizar bases de datos más grandes para clasificar, <strong>entre mayor tamaño mayor cantidad de memoría <code>RAM</code> necesitarás</strong>. Aquí te dejo algunas disponibles, puedes ver más a detalle de su indexación y la gran variedad de bases de datos que ya existen <a href="https://benlangmead.github.io/aws-indexes/k2">aquí</a>:</p>
 <table class="caption-top table" data-quarto-postprocess="true">
 <thead>
@@ -431,6 +432,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">--classified-out</span> <span class="st">"kraken2_classified_k2_standard_20250714_#.fq"</span> <span class="dt">\</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">--unclassified-out</span> <span class="st">"kraken2_unclassified_k2_standard_20250714_#.fq"</span> <span class="dt">\</span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1_QC/host_filter/SRR19746202_1.fastq.gz"</span> <span class="st">"1_QC/host_filter/SRR19746202_2.fastq.gz"</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Resultado:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">32842930</span> sequences <span class="er">(</span><span class="ex">9852.88</span> Mbp<span class="kw">)</span> <span class="ex">processed</span> in 581.113s <span class="er">(</span><span class="ex">3391.0</span> Kseq/m, 1017.31 Mbp/m<span class="kw">)</span><span class="bu">.</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">9536390</span> sequences classified <span class="er">(</span><span class="ex">29.04%</span><span class="kw">)</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">23306540</span> sequences unclassified <span class="er">(</span><span class="ex">70.96%</span><span class="kw">)</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
