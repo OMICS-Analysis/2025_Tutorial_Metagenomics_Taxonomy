@@ -457,51 +457,18 @@ ggplot(plot_data, aes(x = sample, y = percent, fill = name)) +
 #!/usr/bin/env bash
 set -euo pipefail
 
-# -----------------------
-# Config (ajusta THREADS si quieres)
-# -----------------------
 THREADS=8
 
-# Rutas (usé las que me diste)
-FASTQ_DIR="/media/erick/Backup Plus/2025_metagenomics_direct/1_QC/host_filter"
-KRAKEN="/media/erick/Backup Plus/2025_metagenomics_direct/bin/kraken2/kraken2"
-TAR_DB="/media/erick/Backup Plus/2025_metagenomics_direct/k2_standard_16_GB_20250714.tar.gz"
-DB_PARENT="/media/erick/Backup Plus/2025_metagenomics_direct/dbs"
-DB_DIR="$DB_PARENT/db_minusb"   # ruta esperada después de extraer la tar.gz
-OUT_DIR="/media/erick/Backup Plus/2025_metagenomics_direct/kraken2_k2_standard_16GB_20250714"
+FASTQ_DIR="2025_metagenomics_direct/1_QC/host_filter"
+KRAKEN="2025_metagenomics_direct/bin/kraken2/kraken2"
 
-# Opcionales
+DB_PARENT="2025_metagenomics_direct/dbs"
+DB_DIR="$DB_PARENT/db_minusb"  
+OUT_DIR="025_metagenomics_direct/kraken2_k2_standard_16GB_20250714"
+
 USE_NAMES="--use-names"
 GZIP_COMP="--gzip-compressed"
-CONFIDENCE=""   # ejemplo: "--confidence 0.1" si quieres umbral
-# -----------------------
-
-# Comprobaciones básicas
-if [[ ! -x "$KRAKEN" ]]; then
-  echo "ERROR: no encontré el ejecutable Kraken2 en:"
-  echo "  $KRAKEN"
-  echo "Verifica la ruta o hazlo ejecutable con chmod +x."
-  exit 1
-fi
-
-# Si la DB no está extraída, intenta extraerla (si existe el tarball)
-if [[ ! -d "$DB_DIR" ]]; then
-  if [[ -f "$TAR_DB" ]]; then
-    echo "La DB no está extraída. Extrayendo $TAR_DB -> $DB_PARENT ..."
-    mkdir -p "$DB_PARENT"
-    tar -xzf "$TAR_DB" -C "$DB_PARENT"
-    echo "Extracción completada. DB esperada en: $DB_DIR"
-    if [[ ! -d "$DB_DIR" ]]; then
-      echo "ATENCIÓN: Después de extraer, no encontré la carpeta $DB_DIR."
-      echo "Lista el contenido de $DB_PARENT para verificar el nombre exacto."
-      ls -l "$DB_PARENT"
-      exit 1
-    fi
-  else
-    echo "ERROR: la DB no está en $DB_DIR y no hay tarball en $TAR_DB"
-    exit 1
-  fi
-fi
+CONFIDENCE=""   
 
 mkdir -p "$OUT_DIR"
 
@@ -542,6 +509,122 @@ for R1 in "$FASTQ_DIR"/*_1.fastq.gz; do
 done
 
 echo "Procesamiento completado. Reportes en: $OUT_DIR"
+
+```
+
+### Perfil taxonómico de todas las muestras
+
+```{r, message=FALSE}
+#| code-fold: true
+#| code-summary: "Código para barra apiladas de todas las muestras"
+library(tidyverse)
+library(stringr)
+
+
+report_dir <- "/media/erick/Backup Plus/2025_metagenomics_direct/kraken2_k2_standard_16GB_20250714"
+out_prefix  <- file.path(report_dir, "kraken2_combined") 
+
+dirs <- list.dirs(report_dir)[-1]
+
+
+
+rank_to_use <- "P"   # "P" = Phylum; usar "G" para Genus, "S" para Species, etc.
+
+top_n_taxa  <- 10    # número de taxones a destacar; el resto se agrupa como "Otros"
+
+
+#List archivos de reporte (soporta nombres tipo kraken2_report_*.txt y *.report)
+report_files <- sapply(dirs, function(x){
+  list.files(
+    path = x,
+    pattern = "kraken2_report_.*\\.txt$|.*\\.report$",
+    full.names = TRUE
+  ) %>% sort()
+})
+
+
+if(length(report_files) == 0) stop("No se encontraron archivos de reporte en: ", report_dir)
+
+# Función para parsear un kraken2 report usando regex
+
+read_kraken_report <- function(file, rank = "P") {
+  lines <- readLines(file, warn = FALSE)
+  pat <- "^\\s*([0-9]+\\.?[0-9]*)\\s+([0-9]+)\\s+([0-9]+)\\s+([A-Za-z])\\s+([0-9]+)\\s+(.*)$"
+  m <- stringr::str_match(lines, pat)
+  # m is Nx7 matrix: [,2]=percent [,3]=reads_clade [,4]=reads_direct [,5]=rank [,6]=taxid [,7]=name
+  df <- tibble(
+    percent     = suppressWarnings(as.numeric(m[,2])),
+    reads_clade = suppressWarnings(as.integer(m[,3])),
+    reads_direct= suppressWarnings(as.integer(m[,4])),
+    rank_code   = m[,5],
+    taxid       = m[,6],
+    name        = str_trim(m[,7])
+  ) %>%
+    filter(!is.na(rank_code))  # quitar líneas que no matchearon
+  
+  # Nombre de la muestra inferido del nombre de archivo
+  sample_id <- basename(file) %>%
+    str_remove("^kraken2_report_") %>%
+    str_remove("\\.txt$") %>%
+    str_remove("\\.report$")
+  
+  df <- df %>% filter(rank_code == rank) %>% mutate(sample = sample_id)
+  return(df)
+}
+
+
+# Leer y combinar todos los reportes
+
+all_reports <- map_dfr(report_files, read_kraken_report, rank = rank_to_use)
+
+if(nrow(all_reports) == 0) stop("No se encontró ningún registro con el nivel taxonómico solicitado (rank = ", rank_to_use, ")")
+
+
+# Calcular total por taxón en todas las muestras para seleccionar top N
+top_taxa <- all_reports %>%
+  group_by(name) %>%
+  summarise(total_percent = sum(percent, na.rm = TRUE)) %>%
+  arrange(desc(total_percent)) %>%
+  slice_head(n = top_n_taxa) %>%
+  pull(name)
+
+plot_data <- all_reports %>%
+  mutate(taxa_plot = if_else(name %in% top_taxa, name, "Otros")) %>%
+  group_by(sample, taxa_plot) %>%
+  summarise(percent = sum(percent, na.rm = TRUE), .groups = "drop")
+
+# Asegurar orden de muestras consistente (alfabético o puedes definir otro orden)
+plot_data <- plot_data %>% mutate(sample = factor(sample, levels = sort(unique(sample))))
+
+# Plot: barras apiladas
+
+ggplot(plot_data, aes(x = sample, y = percent, fill = taxa_plot)) +
+  geom_bar(stat = "identity", width = 0.7) +
+  labs(
+    title = paste0("Perfil taxonómico (Kraken2) - nivel ", rank_to_use),
+    x = "Muestra",
+    y = "Abundancia relativa (%)",
+    fill = paste0("Taxa (top ", top_n_taxa, " + Otros)")
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid = element_blank(),
+    text = element_text(size = 15)
+  ) +
+  scale_fill_manual(values = c(
+    "#1B263B",
+    "#9B1D64", 
+    "#3E7CB1", 
+    "#F4A261", 
+    "#2A9D8F", 
+    "#E76F51", 
+    "#5C4B51", 
+    "#8AB17D", 
+    "#D00000", 
+    "#FFD166", 
+    "#606C88"  
+  ))
 
 ```
 
