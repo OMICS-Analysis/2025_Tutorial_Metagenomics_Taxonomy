@@ -326,7 +326,7 @@ Escoger la base de datos adecuada influye drasticamente en la clasificación de 
 
 Cuando corres los comandos que te pasé, obtienes **cuatro tipos principales de archivos por base de datos**:
 
-###  `kraken2_output_*.tsv`
+### `kraken2_output_*.tsv`
 
 -   Contiene una línea **por cada lectura**.
 
@@ -344,7 +344,7 @@ Cuando corres los comandos que te pasé, obtienes **cuatro tipos principales de 
 
 -   Útil si quieres rastrear lecturas individuales, pero **no es práctico para gráficos de composición**.
 
-###  `kraken2_report_*.txt`
+### `kraken2_report_*.txt`
 
 -   Es el archivo **más importante para resúmenes**.
 
@@ -382,7 +382,12 @@ Cuando corres los comandos que te pasé, obtienes **cuatro tipos principales de 
 
 ## Visualización del Perfil Taxonómico
 
+En `R`:
+
 ```{r, message=FALSE, warning=FALSE}
+#| code-fold: true
+#| code-summary: "Código para barras apiladas"
+
 # Instalar paquetes si no los tienes
 # install.packages(c("tidyverse"))
 
@@ -445,3 +450,33 @@ ggplot(plot_data, aes(x = sample, y = percent, fill = name)) +
   )
 
 ```
+
+# Bracken
+
+`Bracken` (*Bayesian Reestimation of Abundance with Kraken*), lo puedes descargar de [aquí](https://github.com/jenniferlu717/Bracken), toma los reportes de `Kraken2` y redistribuye las asignaciones de reads, especialmente los ambiguos, para dar estimaciones más precisas de abundancia relativa. `Kraken2` asigna reads a taxones basándose en k-meros, pero no ajusta por diferencias en el tamaño de genomas o sesgos de cobertura. `Bracken` corrige esto, lo que es ideal para gráficos de barras apiladas o análisis cuantitativos.
+
+`Bracken` no usa los archivos FASTQ (SRR19746202_1.fastq.gz y SRR19746202_2.fastq.gz). En cambio, trabaja con los archivos de salida de `Kraken2`: los archivos `.report.txt` (clasificaciones por read) y/o .report.txt (reporte taxonómico).
+
+Bracken necesita acceder a la misma base de datos que usaste en `Kraken2` (`db_minusb` o `db_standard`) porque consulta los índices para ajustar abundancias.
+
+```{bash, eval=FALSE}
+python bin/Bracken/src/est_abundance.py \
+-i kraken2_report_k2_minusb_SRR19746205.txt \
+-k dbs/db_minusb/database75mers.kmer_distrib \
+-l S \
+-o bracken_SRR19746205.txt  
+-l S \
+-t 10
+```
+
+**Explicación de los parámetros**:
+
+-   `-d`: Directorio de la base de datos de Kraken2.
+
+-   `-i`: Archivo .report.txt de Kraken2 como entrada.
+
+-   `-o`: Archivo de salida con el reporte ajustado de Bracken.
+
+-   `-l`: Nivel taxonómico (S para especie, G para género, etc.). Usa S aquí, pero cámbialo a G si prefieres género para el gráfico.
+
+-   `-t`: Umbral mínimo de reads (10 es un valor conservador).

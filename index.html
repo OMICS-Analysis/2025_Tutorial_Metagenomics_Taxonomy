@@ -98,6 +98,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#visualización-del-perfil-taxonómico" id="toc-visualización-del-perfil-taxonómico" class="nav-link" data-scroll-target="#visualización-del-perfil-taxonómico">Visualización del Perfil Taxonómico</a></li>
   </ul></li>
+  <li><a href="#bracken" id="toc-bracken" class="nav-link" data-scroll-target="#bracken">Bracken</a></li>
   </ul>
 </nav>
 </div>
@@ -150,6 +151,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#visualización-del-perfil-taxonómico" id="toc-visualización-del-perfil-taxonómico">Visualización del Perfil Taxonómico</a></li>
   </ul></li>
+  <li><a href="#bracken" id="toc-bracken">Bracken</a></li>
   </ul>
 </nav>
 <div class="quarto-figure quarto-figure-center">
@@ -519,7 +521,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="visualización-del-perfil-taxonómico" class="level2">
 <h2 class="anchored" data-anchor-id="visualización-del-perfil-taxonómico">Visualización del Perfil Taxonómico</h2>
+<p>En <code>R</code>:</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Código para barras apiladas</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Instalar paquetes si no los tienes</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(c("tidyverse"))</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -580,6 +585,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
 <span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid =</span> <span class="fu">element_blank</span>()</span>
 <span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -589,6 +595,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
+</section>
+<section id="bracken" class="level1">
+<h1>Bracken</h1>
+<p><code>Bracken</code> (<em>Bayesian Reestimation of Abundance with Kraken</em>), lo puedes descargar de <a href="https://github.com/jenniferlu717/Bracken">aquí</a>, toma los reportes de <code>Kraken2</code> y redistribuye las asignaciones de reads, especialmente los ambiguos, para dar estimaciones más precisas de abundancia relativa. <code>Kraken2</code> asigna reads a taxones basándose en k-meros, pero no ajusta por diferencias en el tamaño de genomas o sesgos de cobertura. <code>Bracken</code> corrige esto, lo que es ideal para gráficos de barras apiladas o análisis cuantitativos.</p>
+<p><code>Bracken</code> no usa los archivos FASTQ (SRR19746202_1.fastq.gz y SRR19746202_2.fastq.gz). En cambio, trabaja con los archivos de salida de <code>Kraken2</code>: los archivos <code>.report.txt</code> (clasificaciones por read) y/o .report.txt (reporte taxonómico).</p>
+<p>Bracken necesita acceder a la misma base de datos que usaste en <code>Kraken2</code> (<code>db_minusb</code> o <code>db_standard</code>) porque consulta los índices para ajustar abundancias.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> bin/Bracken/src/est_abundance.py <span class="dt">\</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>-i kraken2_report_k2_minusb_SRR19746205.txt <span class="dt">\</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>-k dbs/db_minusb/database75mers.kmer_distrib <span class="dt">\</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>-l S <span class="dt">\</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>-o bracken_SRR19746205.txt  </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="ex">-l</span> S <span class="dt">\</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>-t 10</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Explicación de los parámetros</strong>:</p>
+<ul>
+<li><p><code>-d</code>: Directorio de la base de datos de Kraken2.</p></li>
+<li><p><code>-i</code>: Archivo .report.txt de Kraken2 como entrada.</p></li>
+<li><p><code>-o</code>: Archivo de salida con el reporte ajustado de Bracken.</p></li>
+<li><p><code>-l</code>: Nivel taxonómico (S para especie, G para género, etc.). Usa S aquí, pero cámbialo a G si prefieres género para el gráfico.</p></li>
+<li><p><code>-t</code>: Umbral mínimo de reads (10 es un valor conservador).</p></li>
+</ul>
 </section>
 
 </main>
