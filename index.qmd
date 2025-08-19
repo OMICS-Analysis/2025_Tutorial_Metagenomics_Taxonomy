@@ -780,6 +780,6 @@ ggplot(plot_df, aes(x = sample, y = percent, fill = taxa_plot)) +
   ))
 ```
 
-# **HUMAnN 2.0**
+# HUMAnN 2.0
 
 Para utilizar [`HUMAnN 2.0`](https://huttenhower.sph.harvard.edu/humann2/) vamos a requerir instalar primero a [`MetaPhlAn 2.0`](https://github.com/biobakery/MetaPhlAn2), estas herramientas también nos permitirán hacer un peril taxonómico de muestras de metagenomica partiendo de los archivos FASTQ.
