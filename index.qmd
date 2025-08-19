@@ -451,6 +451,100 @@ ggplot(plot_data, aes(x = sample, y = percent, fill = name)) +
 
 ```
 
+```{bash, eval=FALSE}
+#| code-fold: true
+#| code-summary: "RUN_kraken.sh"
+#!/usr/bin/env bash
+set -euo pipefail
+
+# -----------------------
+# Config (ajusta THREADS si quieres)
+# -----------------------
+THREADS=8
+
+# Rutas (usé las que me diste)
+FASTQ_DIR="/media/erick/Backup Plus/2025_metagenomics_direct/1_QC/host_filter"
+KRAKEN="/media/erick/Backup Plus/2025_metagenomics_direct/bin/kraken2/kraken2"
+TAR_DB="/media/erick/Backup Plus/2025_metagenomics_direct/k2_standard_16_GB_20250714.tar.gz"
+DB_PARENT="/media/erick/Backup Plus/2025_metagenomics_direct/dbs"
+DB_DIR="$DB_PARENT/db_minusb"   # ruta esperada después de extraer la tar.gz
+OUT_DIR="/media/erick/Backup Plus/2025_metagenomics_direct/kraken2_k2_standard_16GB_20250714"
+
+# Opcionales
+USE_NAMES="--use-names"
+GZIP_COMP="--gzip-compressed"
+CONFIDENCE=""   # ejemplo: "--confidence 0.1" si quieres umbral
+# -----------------------
+
+# Comprobaciones básicas
+if [[ ! -x "$KRAKEN" ]]; then
+  echo "ERROR: no encontré el ejecutable Kraken2 en:"
+  echo "  $KRAKEN"
+  echo "Verifica la ruta o hazlo ejecutable con chmod +x."
+  exit 1
+fi
+
+# Si la DB no está extraída, intenta extraerla (si existe el tarball)
+if [[ ! -d "$DB_DIR" ]]; then
+  if [[ -f "$TAR_DB" ]]; then
+    echo "La DB no está extraída. Extrayendo $TAR_DB -> $DB_PARENT ..."
+    mkdir -p "$DB_PARENT"
+    tar -xzf "$TAR_DB" -C "$DB_PARENT"
+    echo "Extracción completada. DB esperada en: $DB_DIR"
+    if [[ ! -d "$DB_DIR" ]]; then
+      echo "ATENCIÓN: Después de extraer, no encontré la carpeta $DB_DIR."
+      echo "Lista el contenido de $DB_PARENT para verificar el nombre exacto."
+      ls -l "$DB_PARENT"
+      exit 1
+    fi
+  else
+    echo "ERROR: la DB no está en $DB_DIR y no hay tarball en $TAR_DB"
+    exit 1
+  fi
+fi
+
+mkdir -p "$OUT_DIR"
+
+# Loop sobre todos los pares *_1.fastq.gz
+shopt -s nullglob
+for R1 in "$FASTQ_DIR"/*_1.fastq.gz; do
+  R2="${R1%_1.fastq.gz}_2.fastq.gz"
+  SAMPLE=$(basename "$R1" "_1.fastq.gz")
+  SAMPLE_OUT="$OUT_DIR/$SAMPLE"
+  mkdir -p "$SAMPLE_OUT"
+
+  if [[ ! -f "$R2" ]]; then
+    echo "SKIP: no existe R2 para $SAMPLE:"
+    echo "  R1=$R1"
+    echo "  R2=$R2"
+    continue
+  fi
+
+  echo "=== Ejecutando Kraken2 para muestra: $SAMPLE ==="
+  echo "R1: $R1"
+  echo "R2: $R2"
+  echo "Salida: $SAMPLE_OUT"
+
+  "$KRAKEN" \
+    --db "$DB_DIR" \
+    --paired \
+    $GZIP_COMP \
+    --threads "$THREADS" \
+    $USE_NAMES \
+    $CONFIDENCE \
+    --report "$SAMPLE_OUT/${SAMPLE}.report" \
+    --output "$SAMPLE_OUT/${SAMPLE}.kraken" \
+    "$R1" "$R2" \
+    2>&1 | tee "$SAMPLE_OUT/${SAMPLE}_kraken.log"
+
+  echo ">>> Terminado $SAMPLE"
+  echo
+done
+
+echo "Procesamiento completado. Reportes en: $OUT_DIR"
+
+```
+
 # Bracken
 
 `Bracken` (*Bayesian Reestimation of Abundance with Kraken*), lo puedes descargar de [aquí](https://github.com/jenniferlu717/Bracken), toma los reportes de `Kraken2` y redistribuye las asignaciones de reads, especialmente los ambiguos, para dar estimaciones más precisas de abundancia relativa. `Kraken2` asigna reads a taxones basándose en k-meros, pero no ajusta por diferencias en el tamaño de genomas o sesgos de cobertura. `Bracken` corrige esto, lo que es ideal para gráficos de barras apiladas o análisis cuantitativos.
