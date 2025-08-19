@@ -520,18 +520,13 @@ echo "Procesamiento completado. Reportes en: $OUT_DIR"
 library(tidyverse)
 library(stringr)
 
-
 report_dir <- "all_reports/"
 out_prefix  <- file.path(report_dir, "kraken2_combined") 
-
 dirs <- list.dirs(report_dir)[-1]
-
-
 
 rank_to_use <- "P"   # "P" = Phylum; usar "G" para Genus, "S" para Species, etc.
 
 top_n_taxa  <- 10    # número de taxones a destacar; el resto se agrupa como "Otros"
-
 
 #List archivos de reporte (soporta nombres tipo kraken2_report_*.txt y *.report)
 report_files <- sapply(dirs, function(x){
