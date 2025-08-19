@@ -101,7 +101,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#perfil-taxonómico-de-todas-las-muestras" id="toc-perfil-taxonómico-de-todas-las-muestras" class="nav-link" data-scroll-target="#perfil-taxonómico-de-todas-las-muestras">Perfil taxonómico de todas las muestras</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#bracken" id="toc-bracken" class="nav-link" data-scroll-target="#bracken">Bracken</a></li>
+  <li><a href="#bracken" id="toc-bracken" class="nav-link" data-scroll-target="#bracken">Bracken</a>
+  <ul class="collapse">
+  <li><a href="#visualización-de-los-resultados" id="toc-visualización-de-los-resultados" class="nav-link" data-scroll-target="#visualización-de-los-resultados">Visualización de los resultados</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -157,7 +160,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#perfil-taxonómico-de-todas-las-muestras" id="toc-perfil-taxonómico-de-todas-las-muestras">Perfil taxonómico de todas las muestras</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#bracken" id="toc-bracken">Bracken</a></li>
+  <li><a href="#bracken" id="toc-bracken">Bracken</a>
+  <ul>
+  <li><a href="#visualización-de-los-resultados" id="toc-visualización-de-los-resultados">Visualización de los resultados</a></li>
+  </ul></li>
   </ul>
 </nav>
 <div class="quarto-figure quarto-figure-center">
@@ -788,20 +794,155 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> bin/Bracken/src/est_abundance.py <span class="dt">\</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>-i kraken2_report_k2_minusb_SRR19746205.txt <span class="dt">\</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>-k dbs/db_minusb/database75mers.kmer_distrib <span class="dt">\</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>-l S <span class="dt">\</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>-k dbs/db_minusb/database150mers.kmer_distrib <span class="dt">\</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>-l P <span class="dt">\</span></span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>-o bracken_SRR19746205.txt  </span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="ex">-l</span> S <span class="dt">\</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>-t 10</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="ex">-t</span> 10</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Explicación de los parámetros</strong>:</p>
 <ul>
 <li><p><code>-d</code>: Directorio de la base de datos de Kraken2.</p></li>
 <li><p><code>-i</code>: Archivo .report.txt de Kraken2 como entrada.</p></li>
 <li><p><code>-o</code>: Archivo de salida con el reporte ajustado de Bracken.</p></li>
-<li><p><code>-l</code>: Nivel taxonómico (S para especie, G para género, etc.). Usa S aquí, pero cámbialo a G si prefieres género para el gráfico.</p></li>
+<li><p><code>-l</code>: Nivel taxonómico (P para Phylum, S para especie, G para género, etc.). Usa S aquí, pero cámbialo a G si prefieres género para el gráfico.</p></li>
 <li><p><code>-t</code>: Umbral mínimo de reads (10 es un valor conservador).</p></li>
 </ul>
+<section id="visualización-de-los-resultados" class="level3">
+<h3 class="anchored" data-anchor-id="visualización-de-los-resultados">Visualización de los resultados</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Código para barra apiladas de todas las muestras</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>bracken_dir <span class="ot">&lt;-</span> <span class="st">"bracken_reports"</span>   </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>out_prefix  <span class="ot">&lt;-</span> <span class="fu">file.path</span>(bracken_dir, <span class="st">"bracken_phylum_combined"</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>top_n_taxa  <span class="ot">&lt;-</span> <span class="dv">10</span>                  <span class="co"># cantidad de phyla a mostrar; resto -&gt; "Otros"</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Listar archivos bracken (pattern: *_bracken.txt)</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>bracken_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(bracken_dir, <span class="at">pattern =</span> <span class="st">"_bracken</span><span class="sc">\\</span><span class="st">.txt$"</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">sort</span>()</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Función para leer cada archivo y extraer Phylum</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>read_bracken_file <span class="ot">&lt;-</span> <span class="cf">function</span>(f) {</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">read.table</span>(f, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">sep =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>, <span class="at">quote =</span> <span class="st">""</span>, <span class="at">comment.char =</span> <span class="st">""</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>, <span class="at">fill =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Asegurarse de columnas esperadas</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  expected_cols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"name"</span>,<span class="st">"taxonomy_id"</span>,<span class="st">"taxonomy_lvl"</span>,<span class="st">"kraken_assigned_reads"</span>,<span class="st">"added_reads"</span>,<span class="st">"new_est_reads"</span>,<span class="st">"fraction_total_reads"</span>)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  present <span class="ot">&lt;-</span> <span class="fu">intersect</span>(expected_cols, <span class="fu">colnames</span>(df))</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span>(<span class="st">"taxonomy_lvl"</span> <span class="sc">%in%</span> <span class="fu">colnames</span>(df))) <span class="fu">stop</span>(<span class="st">"El archivo "</span>, f, <span class="st">" no tiene columna 'taxonomy_lvl'"</span>)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Filtrar phylum</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  dfp <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(taxonomy_lvl <span class="sc">==</span> <span class="st">"P"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">name =</span> <span class="fu">as.character</span>(name),</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">taxonomy_id =</span> taxonomy_id,</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">kraken_assigned_reads =</span> <span class="cf">if</span>(<span class="st">"kraken_assigned_reads"</span> <span class="sc">%in%</span> <span class="fu">colnames</span>(df)) kraken_assigned_reads <span class="cf">else</span> <span class="cn">NA_integer_</span>,</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">added_reads =</span> <span class="cf">if</span>(<span class="st">"added_reads"</span> <span class="sc">%in%</span> <span class="fu">colnames</span>(df)) added_reads <span class="cf">else</span> <span class="cn">NA_integer_</span>,</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">new_est_reads =</span> <span class="cf">if</span>(<span class="st">"new_est_reads"</span> <span class="sc">%in%</span> <span class="fu">colnames</span>(df)) new_est_reads <span class="cf">else</span> <span class="cn">NA_real_</span>,</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">fraction_total_reads =</span> <span class="cf">if</span>(<span class="st">"fraction_total_reads"</span> <span class="sc">%in%</span> <span class="fu">colnames</span>(df)) fraction_total_reads <span class="cf">else</span> <span class="cn">NA_real_</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>  sample <span class="ot">&lt;-</span> <span class="fu">basename</span>(f) <span class="sc">%&gt;%</span> <span class="fu">str_remove</span>(<span class="st">"_bracken</span><span class="sc">\\</span><span class="st">.txt$"</span>)</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>  dfp <span class="ot">&lt;-</span> dfp <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">sample =</span> sample)</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(dfp)</span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Leer y combinar</span></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>bracken_list <span class="ot">&lt;-</span> <span class="fu">map</span>(bracken_files, read_bracken_file)</span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>bracken_all  <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(bracken_list)</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="fu">nrow</span>(bracken_all) <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">stop</span>(<span class="st">"No hay filas para Phylum (taxonomy_lvl == 'P') en los archivos identificados."</span>)</span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular percent preferir fraction_total_reads; si NA -&gt; normalizar new_est_reads por muestra</span></span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>bracken_all <span class="ot">&lt;-</span> bracken_all <span class="sc">%&gt;%</span></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sample) <span class="sc">%&gt;%</span></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent =</span> <span class="fu">case_when</span>(</span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!</span><span class="fu">is.na</span>(fraction_total_reads) <span class="sc">~</span> <span class="dv">100</span> <span class="sc">*</span> fraction_total_reads,</span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(fraction_total_reads) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(new_est_reads) <span class="sc">&amp;</span> <span class="fu">sum</span>(new_est_reads, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="dv">100</span> <span class="sc">*</span> new_est_reads <span class="sc">/</span> <span class="fu">sum</span>(new_est_reads, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_real_</span></span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a><span class="co"># Resumir abundancia total por taxon para elegir top N</span></span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a>taxa_totals <span class="ot">&lt;-</span> bracken_all <span class="sc">%&gt;%</span></span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name) <span class="sc">%&gt;%</span></span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_percent =</span> <span class="fu">sum</span>(percent, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(total_percent))</span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>top_taxa <span class="ot">&lt;-</span> taxa_totals <span class="sc">%&gt;%</span> <span class="fu">slice_head</span>(<span class="at">n =</span> top_n_taxa) <span class="sc">%&gt;%</span> <span class="fu">pull</span>(name)</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a><span class="co"># Agrupar resto como "Otros"</span></span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>plot_df <span class="ot">&lt;-</span> bracken_all <span class="sc">%&gt;%</span></span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(percent)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">taxa_plot =</span> <span class="fu">if_else</span>(name <span class="sc">%in%</span> top_taxa, name, <span class="st">"Otros"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sample, taxa_plot) <span class="sc">%&gt;%</span></span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">percent =</span> <span class="fu">sum</span>(percent, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a><span class="co"># Asegurar orden de muestras (alfabético por defecto; ajusta si quieres otro orden)</span></span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a>sample_order <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">unique</span>(plot_df<span class="sc">$</span>sample))</span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a>plot_df <span class="ot">&lt;-</span> plot_df <span class="sc">%&gt;%</span></span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sample =</span> <span class="fu">factor</span>(sample, <span class="at">levels =</span> sample_order))</span>
+<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a><span class="co"># Ordenar niveles de taxa_plot para colores/leyenda consistente: por abundancia total descendente</span></span>
+<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a>taxa_order <span class="ot">&lt;-</span> plot_df <span class="sc">%&gt;%</span></span>
+<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(taxa_plot) <span class="sc">%&gt;%</span></span>
+<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total =</span> <span class="fu">sum</span>(percent, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(total)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(taxa_plot)</span>
+<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a>plot_df <span class="ot">&lt;-</span> plot_df <span class="sc">%&gt;%</span></span>
+<span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">taxa_plot =</span> <span class="fu">factor</span>(taxa_plot, <span class="at">levels =</span> taxa_order))</span>
+<span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a><span class="co"># # Guardar tablas long y wide</span></span>
+<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a><span class="co"># csv_long &lt;- paste0(out_prefix, "_long.csv")</span></span>
+<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a><span class="co"># csv_wide &lt;- paste0(out_prefix, "_wide.csv")</span></span>
+<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a><span class="co"># readr::write_csv(plot_df, csv_long)</span></span>
+<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a><span class="co"># plot_wide &lt;- plot_df %&gt;% pivot_wider(names_from = taxa_plot, values_from = percent, values_fill = 0)</span></span>
+<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot: barras apiladas (Phylum)</span></span>
+<span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_df, <span class="fu">aes</span>(<span class="at">x =</span> sample, <span class="at">y =</span> percent, <span class="at">fill =</span> taxa_plot)) <span class="sc">+</span></span>
+<span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">width =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Composición por Phylum (Bracken)"</span>,</span>
+<span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Muestra"</span>,</span>
+<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Abundancia relativa (%)"</span>,</span>
+<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="fu">paste0</span>(<span class="st">"Phylum (top "</span>, top_n_taxa, <span class="st">" + Otros)"</span>)</span>
+<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb12-102"><a href="#cb12-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb12-103"><a href="#cb12-103" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
+<span id="cb12-104"><a href="#cb12-104" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb12-105"><a href="#cb12-105" aria-hidden="true" tabindex="-1"></a>    <span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size=</span><span class="dv">15</span>)</span>
+<span id="cb12-106"><a href="#cb12-106" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb12-107"><a href="#cb12-107" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb12-108"><a href="#cb12-108" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#1B263B"</span>,</span>
+<span id="cb12-109"><a href="#cb12-109" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#9B1D64"</span>, </span>
+<span id="cb12-110"><a href="#cb12-110" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#3E7CB1"</span>, </span>
+<span id="cb12-111"><a href="#cb12-111" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#F4A261"</span>, </span>
+<span id="cb12-112"><a href="#cb12-112" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#2A9D8F"</span>, </span>
+<span id="cb12-113"><a href="#cb12-113" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#E76F51"</span>, </span>
+<span id="cb12-114"><a href="#cb12-114" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#5C4B51"</span>, </span>
+<span id="cb12-115"><a href="#cb12-115" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#8AB17D"</span>, </span>
+<span id="cb12-116"><a href="#cb12-116" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#D00000"</span>, </span>
+<span id="cb12-117"><a href="#cb12-117" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#FFD166"</span>, </span>
+<span id="cb12-118"><a href="#cb12-118" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#606C88"</span>,</span>
+<span id="cb12-119"><a href="#cb12-119" aria-hidden="true" tabindex="-1"></a>    <span class="st">"darkgreen"</span>,</span>
+<span id="cb12-120"><a href="#cb12-120" aria-hidden="true" tabindex="-1"></a>    <span class="st">"darkblue"</span></span>
+<span id="cb12-121"><a href="#cb12-121" aria-hidden="true" tabindex="-1"></a>  ))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 
 </main>

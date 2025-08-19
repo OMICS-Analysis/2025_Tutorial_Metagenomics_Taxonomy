@@ -634,10 +634,9 @@ Bracken necesita acceder a la misma base de datos que usaste en `Kraken2` (`db_m
 ```{bash, eval=FALSE}
 python bin/Bracken/src/est_abundance.py \
 -i kraken2_report_k2_minusb_SRR19746205.txt \
--k dbs/db_minusb/database75mers.kmer_distrib \
--l S \
+-k dbs/db_minusb/database150mers.kmer_distrib \
+-l P \
 -o bracken_SRR19746205.txt  
--l S \
 -t 10
 ```
 
@@ -649,6 +648,134 @@ python bin/Bracken/src/est_abundance.py \
 
 -   `-o`: Archivo de salida con el reporte ajustado de Bracken.
 
--   `-l`: Nivel taxonómico (S para especie, G para género, etc.). Usa S aquí, pero cámbialo a G si prefieres género para el gráfico.
+-   `-l`: Nivel taxonómico (P para Phylum, S para especie, G para género, etc.). Usa S aquí, pero cámbialo a G si prefieres género para el gráfico.
 
 -   `-t`: Umbral mínimo de reads (10 es un valor conservador).
+
+### Visualización de los resultados
+
+```{r, message=FALSE}
+#| code-fold: true
+#| code-summary: "Código para barra apiladas de todas las muestras"
+library(tidyverse)
+
+bracken_dir <- "bracken_reports"   
+out_prefix  <- file.path(bracken_dir, "bracken_phylum_combined")
+top_n_taxa  <- 10                  # cantidad de phyla a mostrar; resto -> "Otros"
+
+
+# Listar archivos bracken (pattern: *_bracken.txt)
+bracken_files <- list.files(bracken_dir, pattern = "_bracken\\.txt$", full.names = TRUE) %>% sort()
+
+
+# Función para leer cada archivo y extraer Phylum
+read_bracken_file <- function(f) {
+  df <- read.table(f, header = TRUE, sep = "\t", quote = "", comment.char = "", stringsAsFactors = FALSE, fill = TRUE)
+  # Asegurarse de columnas esperadas
+  expected_cols <- c("name","taxonomy_id","taxonomy_lvl","kraken_assigned_reads","added_reads","new_est_reads","fraction_total_reads")
+  present <- intersect(expected_cols, colnames(df))
+  if(!("taxonomy_lvl" %in% colnames(df))) stop("El archivo ", f, " no tiene columna 'taxonomy_lvl'")
+  # Filtrar phylum
+  dfp <- df %>%
+    filter(taxonomy_lvl == "P") %>%
+    transmute(
+      name = as.character(name),
+      taxonomy_id = taxonomy_id,
+      kraken_assigned_reads = if("kraken_assigned_reads" %in% colnames(df)) kraken_assigned_reads else NA_integer_,
+      added_reads = if("added_reads" %in% colnames(df)) added_reads else NA_integer_,
+      new_est_reads = if("new_est_reads" %in% colnames(df)) new_est_reads else NA_real_,
+      fraction_total_reads = if("fraction_total_reads" %in% colnames(df)) fraction_total_reads else NA_real_
+    )
+  sample <- basename(f) %>% str_remove("_bracken\\.txt$")
+  dfp <- dfp %>% mutate(sample = sample)
+  return(dfp)
+}
+
+# Leer y combinar
+bracken_list <- map(bracken_files, read_bracken_file)
+bracken_all  <- bind_rows(bracken_list)
+
+if(nrow(bracken_all) == 0) stop("No hay filas para Phylum (taxonomy_lvl == 'P') en los archivos identificados.")
+
+# Calcular percent preferir fraction_total_reads; si NA -> normalizar new_est_reads por muestra
+bracken_all <- bracken_all %>%
+  group_by(sample) %>%
+  mutate(
+    percent = case_when(
+      !is.na(fraction_total_reads) ~ 100 * fraction_total_reads,
+      is.na(fraction_total_reads) & !is.na(new_est_reads) & sum(new_est_reads, na.rm = TRUE) > 0 ~ 100 * new_est_reads / sum(new_est_reads, na.rm = TRUE),
+      TRUE ~ NA_real_
+    )
+  ) %>%
+  ungroup()
+
+
+# Resumir abundancia total por taxon para elegir top N
+taxa_totals <- bracken_all %>%
+  group_by(name) %>%
+  summarise(total_percent = sum(percent, na.rm = TRUE)) %>%
+  arrange(desc(total_percent))
+
+top_taxa <- taxa_totals %>% slice_head(n = top_n_taxa) %>% pull(name)
+
+# Agrupar resto como "Otros"
+plot_df <- bracken_all %>%
+  filter(!is.na(percent)) %>%
+  mutate(taxa_plot = if_else(name %in% top_taxa, name, "Otros")) %>%
+  group_by(sample, taxa_plot) %>%
+  summarise(percent = sum(percent, na.rm = TRUE), .groups = "drop")
+
+# Asegurar orden de muestras (alfabético por defecto; ajusta si quieres otro orden)
+sample_order <- sort(unique(plot_df$sample))
+plot_df <- plot_df %>%
+  mutate(sample = factor(sample, levels = sample_order))
+
+# Ordenar niveles de taxa_plot para colores/leyenda consistente: por abundancia total descendente
+taxa_order <- plot_df %>%
+  group_by(taxa_plot) %>%
+  summarise(total = sum(percent, na.rm = TRUE)) %>%
+  arrange(desc(total)) %>%
+  pull(taxa_plot)
+
+plot_df <- plot_df %>%
+  mutate(taxa_plot = factor(taxa_plot, levels = taxa_order))
+
+# # Guardar tablas long y wide
+# csv_long <- paste0(out_prefix, "_long.csv")
+# csv_wide <- paste0(out_prefix, "_wide.csv")
+# 
+# readr::write_csv(plot_df, csv_long)
+
+# plot_wide <- plot_df %>% pivot_wider(names_from = taxa_plot, values_from = percent, values_fill = 0)
+
+# Plot: barras apiladas (Phylum)
+ggplot(plot_df, aes(x = sample, y = percent, fill = taxa_plot)) +
+  geom_bar(stat = "identity", width = 0.7) +
+  labs(
+    title = "Composición por Phylum (Bracken)",
+    x = "Muestra",
+    y = "Abundancia relativa (%)",
+    fill = paste0("Phylum (top ", top_n_taxa, " + Otros)")
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid = element_blank(),
+    text = element_text(size=15)
+  ) +
+  scale_fill_manual(values = c(
+    "#1B263B",
+    "#9B1D64", 
+    "#3E7CB1", 
+    "#F4A261", 
+    "#2A9D8F", 
+    "#E76F51", 
+    "#5C4B51", 
+    "#8AB17D", 
+    "#D00000", 
+    "#FFD166", 
+    "#606C88",
+    "darkgreen",
+    "darkblue"
+  ))
+```
