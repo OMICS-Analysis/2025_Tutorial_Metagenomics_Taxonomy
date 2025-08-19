@@ -21,7 +21,7 @@ lang: es
 
 Vamos a utilizar `Kraken v2`, lo puedes descragar [aquí](https://ccb.jhu.edu/software/kraken/MANUAL.html).
 
-Este tutorial se hizo utilizando un equipo A`SUSTeK COMPUTER INC. G75VW` con procesador `Intel® Core™ i7-3610QM CPU @ 2.30GHz × 8`, `24 GB` de `RAM`.
+Este tutorial se hizo utilizando un equipo A`SUSTeK COMPUTER INC. G75VW` con procesador `Intel® Core™ i7-3610QM CPU @ 2.30GHz × 8`, `24 GB` de `RAM`. Sistema operativo `Ubuntu 22.04.5 LTS`.
 
 Advertencia ⚠️. Según tus capacidades computacionales puedes utilizar bases de datos más grandes para clasificar, **entre mayor tamaño mayor cantidad de memoría `RAM` necesitarás**. Aquí te dejo algunas disponibles, puedes ver más a detalle de su indexación y la gran variedad de bases de datos que ya existen [aquí](https://benlangmead.github.io/aws-indexes/k2):
 
