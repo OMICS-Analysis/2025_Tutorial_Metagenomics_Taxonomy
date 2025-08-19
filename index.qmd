@@ -783,3 +783,15 @@ ggplot(plot_df, aes(x = sample, y = percent, fill = taxa_plot)) +
 # HUMAnN 2.0
 
 Para utilizar [`HUMAnN 2.0`](https://huttenhower.sph.harvard.edu/humann2/) vamos a requerir instalar primero a [`MetaPhlAn 2.0`](https://github.com/biobakery/MetaPhlAn2), estas herramientas también nos permitirán hacer un peril taxonómico de muestras de metagenomica partiendo de los archivos FASTQ.
+
+Vamos a descargar la base de datos que utilizaremos para le perfil taxnómico (`Base de datos filtrada UniRef90 EC`), vamos a utilizar el mismo directorio `2025_metagenomics_direct/dbs`:
+
+```{bash, eval=FALSE}
+humann2_databases --download uniref uniref90_ec_filtered_diamond ./
+```
+
+También necesitamos descargar la base de datos `ChocoPhlAn`:
+
+```{bash, eval=FALSE}
+humann2_databases --download chocophlan full ./
+```

@@ -949,6 +949,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="humann-2.0" class="level1">
 <h1>HUMAnN 2.0</h1>
 <p>Para utilizar <a href="https://huttenhower.sph.harvard.edu/humann2/"><code>HUMAnN 2.0</code></a> vamos a requerir instalar primero a <a href="https://github.com/biobakery/MetaPhlAn2"><code>MetaPhlAn 2.0</code></a>, estas herramientas también nos permitirán hacer un peril taxonómico de muestras de metagenomica partiendo de los archivos FASTQ.</p>
+<p>Vamos a descargar la base de datos que utilizaremos para le perfil taxnómico (<code>Base de datos filtrada UniRef90 EC</code>), vamos a utilizar el mismo directorio <code>2025_metagenomics_direct/dbs</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">humann2_databases</span> <span class="at">--download</span> uniref uniref90_ec_filtered_diamond ./</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>También necesitamos descargar la base de datos <code>ChocoPhlAn</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">humann2_databases</span> <span class="at">--download</span> chocophlan full ./</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 
 </main>
