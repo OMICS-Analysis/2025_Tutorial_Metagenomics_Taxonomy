@@ -521,7 +521,7 @@ library(tidyverse)
 library(stringr)
 
 
-report_dir <- "/media/erick/Backup Plus/2025_metagenomics_direct/kraken2_k2_standard_16GB_20250714"
+report_dir <- "all_reports/"
 out_prefix  <- file.path(report_dir, "kraken2_combined") 
 
 dirs <- list.dirs(report_dir)[-1]
