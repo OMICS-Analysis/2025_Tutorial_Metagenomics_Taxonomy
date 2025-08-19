@@ -808,5 +808,5 @@ Ahora si corremos el flujo de trabajo completo:
 humann2 \
 --input 1_QC/host_filter/SRR19746202.fastq.gz \
 --output 3_humann2 \
---metaphlan bin/MetaPhlAn2
+--metaphlan bin/MetaPhlAn2/metaphlan2.py
 ```
