@@ -806,16 +806,9 @@ Vamos a descargar las herramientas de mapeo:
 humann_databases --download utility_mapping full ./
 ```
 
-Ahora si corremos el flujo de trabajo completo:
+### MetaPhlAn
 
-```{bash, eval=FALSE}
-humann \
---input 1_QC/host_filter/SRR19746202.fastq.gz \
---output 3_humann2 \
---metaphlan bin/MetaPhlAn/metaphlan.py
-```
-
-Ojo, para evitar problemas de compatibilidad usar la siguiente vía de instalación de MetaPhlan, además qué te ayudará a futuro a ejecutar esta herramienta individualmente:
+**Ojo**, para evitar problemas de compatibilidad usar la siguiente vía de instalación de MetaPhlan, además qué te ayudará a futuro a ejecutar esta herramienta individualmente:
 
 ```{bash, eval=FALSE}
 git clone https://github.com/biobakery/MetaPhlAn.git
@@ -827,6 +820,15 @@ Descargar las bases de datos correspondientes a MetaPhlan (Necesitarás `~30GB` 
 
 ```{bash, eval=FALSE}
 metaphlan --install
+```
+
+Ahora si corremos el flujo de trabajo completo:
+
+```{bash, eval=FALSE}
+humann \
+--input 1_QC/host_filter/SRR19746202.fastq.gz \
+--output 3_humann \
+--metaphlan bin/MetaPhlAn/metaphlan.py
 ```
 
 ### Extra: Alternativa con ambientes conda

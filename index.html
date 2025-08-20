@@ -107,6 +107,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#humann-3.0" id="toc-humann-3.0" class="nav-link" data-scroll-target="#humann-3.0">HUMAnN 3.0</a>
   <ul class="collapse">
+  <li><a href="#metaphlan" id="toc-metaphlan" class="nav-link" data-scroll-target="#metaphlan">MetaPhlAn</a></li>
   <li><a href="#extra-alternativa-con-ambientes-conda" id="toc-extra-alternativa-con-ambientes-conda" class="nav-link" data-scroll-target="#extra-alternativa-con-ambientes-conda">Extra: Alternativa con ambientes conda</a></li>
   </ul></li>
   </ul>
@@ -170,6 +171,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#humann-3.0" id="toc-humann-3.0">HUMAnN 3.0</a>
   <ul>
+  <li><a href="#metaphlan" id="toc-metaphlan">MetaPhlAn</a></li>
   <li><a href="#extra-alternativa-con-ambientes-conda" id="toc-extra-alternativa-con-ambientes-conda">Extra: Alternativa con ambientes conda</a></li>
   </ul></li>
   </ul>
@@ -970,23 +972,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">humann_databases</span> <span class="at">--download</span> utility_mapping full ./</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Ahora si corremos el flujo de trabajo completo:</p>
+<section id="metaphlan" class="level3">
+<h3 class="anchored" data-anchor-id="metaphlan">MetaPhlAn</h3>
+<p><strong>Ojo</strong>, para evitar problemas de compatibilidad usar la siguiente vía de instalación de MetaPhlan, además qué te ayudará a futuro a ejecutar esta herramienta individualmente:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">humann</span> <span class="dt">\</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>--input 1_QC/host_filter/SRR19746202.fastq.gz <span class="dt">\</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>--output 3_humann2 <span class="dt">\</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>--metaphlan bin/MetaPhlAn/metaphlan.py</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Ojo, para evitar problemas de compatibilidad usar la siguiente vía de instalación de MetaPhlan, además qué te ayudará a futuro a ejecutar esta herramienta individualmente:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/biobakery/MetaPhlAn.git</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> MetaPhlAn</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install .</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/biobakery/MetaPhlAn.git</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> MetaPhlAn</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install .</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Descargar las bases de datos correspondientes a MetaPhlan (Necesitarás <code>~30GB</code> para este paso, tómate tu tiempo, va a tardar):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">metaphlan</span> <span class="at">--install</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">metaphlan</span> <span class="at">--install</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Ahora si corremos el flujo de trabajo completo:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">humann</span> <span class="dt">\</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>--input 1_QC/host_filter/SRR19746202.fastq.gz <span class="dt">\</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>--output 3_humann <span class="dt">\</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>--metaphlan bin/MetaPhlAn/metaphlan.py</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
 <section id="extra-alternativa-con-ambientes-conda" class="level3">
 <h3 class="anchored" data-anchor-id="extra-alternativa-con-ambientes-conda">Extra: Alternativa con ambientes conda</h3>
 <p>Para tener compatibilidad de todas las herramientas que utiliza HUMAnN te recomiendo crean un ambiente con <code>conda</code> o <code>mamba</code>.</p>
