@@ -105,7 +105,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#visualización-de-los-resultados" id="toc-visualización-de-los-resultados" class="nav-link" data-scroll-target="#visualización-de-los-resultados">Visualización de los resultados</a></li>
   </ul></li>
-  <li><a href="#humann-2.0" id="toc-humann-2.0" class="nav-link" data-scroll-target="#humann-2.0">HUMAnN 2.0</a></li>
+  <li><a href="#humann-3.0" id="toc-humann-3.0" class="nav-link" data-scroll-target="#humann-3.0">HUMAnN 3.0</a>
+  <ul class="collapse">
+  <li><a href="#extra-alternativa-con-ambientes-conda" id="toc-extra-alternativa-con-ambientes-conda" class="nav-link" data-scroll-target="#extra-alternativa-con-ambientes-conda">Extra: Alternativa con ambientes conda</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -165,7 +168,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#visualización-de-los-resultados" id="toc-visualización-de-los-resultados">Visualización de los resultados</a></li>
   </ul></li>
-  <li><a href="#humann-2.0" id="toc-humann-2.0">HUMAnN 2.0</a></li>
+  <li><a href="#humann-3.0" id="toc-humann-3.0">HUMAnN 3.0</a>
+  <ul>
+  <li><a href="#extra-alternativa-con-ambientes-conda" id="toc-extra-alternativa-con-ambientes-conda">Extra: Alternativa con ambientes conda</a></li>
+  </ul></li>
   </ul>
 </nav>
 <div class="quarto-figure quarto-figure-center">
@@ -946,28 +952,100 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 </section>
-<section id="humann-2.0" class="level1">
-<h1>HUMAnN 2.0</h1>
-<p>Para utilizar <a href="https://huttenhower.sph.harvard.edu/humann2/"><code>HUMAnN 2.0</code></a> vamos a requerir instalar primero a <a href="https://github.com/biobakery/MetaPhlAn2"><code>MetaPhlAn 2.0</code></a>, estas herramientas también nos permitirán hacer un peril taxonómico de muestras de metagenomica partiendo de los archivos FASTQ.</p>
-<p>Vamos a descargar la base de datos que utilizaremos para le perfil taxnómico (<code>Base de datos filtrada UniRef90 EC</code>), vamos a utilizar el mismo directorio <code>2025_metagenomics_direct/dbs</code>:</p>
+<section id="humann-3.0" class="level1">
+<h1>HUMAnN 3.0</h1>
+<p>Para utilizar <a href="https://github.com/biobakery/humann/?tab=readme-ov-file#3-test-the-install"><code>HUMAnN 3.0</code></a> vamos a requerir instalar primero a <a href="https://huttenhower.sph.harvard.edu/metaphlan3/"><code>MetaPhlAn</code></a>, estas herramientas también nos permitirán hacer un peril taxonómico de muestras de metagenomica partiendo de los archivos FASTQ.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">humann2_databases</span> <span class="at">--download</span> uniref uniref90_ec_filtered_diamond ./</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install humann</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>También necesitamos descargar la base de datos <code>ChocoPhlAn</code>:</p>
+<p>Vamos a descargar la base de datos que utilizaremos para le perfil taxonómico (<code>Base de datos filtrada UniRef90 EC</code>), vamos a utilizar el mismo directorio <code>2025_metagenomics_direct/dbs</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">humann2_databases</span> <span class="at">--download</span> chocophlan full ./</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">humann_databases</span> <span class="at">--download</span> uniref uniref90_ec_filtered_diamond ./</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>También necesitamos descargar la base de datos <code>ChocoPhlAn</code> (Este paso toma su tiempo, paciencia):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">humann_databases</span> <span class="at">--download</span> chocophlan full ./</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Vamos a descargar las herramientas de mapeo:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">humann2_databases</span> <span class="at">--download</span> utility_mapping full ./</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">humann_databases</span> <span class="at">--download</span> utility_mapping full ./</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Ahora si corremos el flujo de trabajo completo:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">humann2</span> <span class="dt">\</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>--input 1_QC/host_filter/SRR19746202.fastq.gz <span class="dt">\</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>--output 3_humann2 <span class="dt">\</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>--metaphlan bin/MetaPhlAn2/metaphlan2.py</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">humann</span> <span class="dt">\</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>--input 1_QC/host_filter/SRR19746202.fastq.gz <span class="dt">\</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>--output 3_humann2 <span class="dt">\</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>--metaphlan bin/MetaPhlAn/metaphlan.py</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Ojo, para evitar problemas de compatibilidad usar la siguiente vía de instalación de MetaPhlan, además qué te ayudará a futuro a ejecutar esta herramienta individualmente:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/biobakery/MetaPhlAn.git</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> MetaPhlAn</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install .</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Descargar las bases de datos correspondientes a MetaPhlan (Necesitarás <code>~30GB</code> para este paso, tómate tu tiempo, va a tardar):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">metaphlan</span> <span class="at">--install</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="extra-alternativa-con-ambientes-conda" class="level3">
+<h3 class="anchored" data-anchor-id="extra-alternativa-con-ambientes-conda">Extra: Alternativa con ambientes conda</h3>
+<p>Para tener compatibilidad de todas las herramientas que utiliza HUMAnN te recomiendo crean un ambiente con <code>conda</code> o <code>mamba</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mamba</span> create <span class="at">-n</span> humann_env <span class="at">-c</span> conda-forge <span class="at">-c</span> bioconda <span class="dt">\</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  humann bowtie2 diamond vsearch metaphlan <span class="at">-y</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate humann_env</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install humann</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="ex">humann_config</span> <span class="at">--update</span> database_folders nucleotide dbs/chocophlan</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="ex">humann_config</span> <span class="at">--update</span> database_folders protein dbs/uniref</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><em>Extra: para poder lograr una correcta cohersión de versiones y parametros de <code>metaphlan</code> se tuvieron que hacer los siguientes ajustes, si usas ambiente conda</em>:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Correciones a metaphlan</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/miniconda3/envs/humann_env/bin</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> metaphlan metaphlan.real</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&gt;</span> metaphlan <span class="op">&lt;&lt;'EOF'</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="st">#!/usr/bin/env bash</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="st"># Wrapper para compatibilizar llamadas antiguas (--bowtie2out) con MetaPhlAn4 (--mapout)</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="st">REAL_METAPHLAN="$(dirname "$0")/metaphlan.real"</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="st">newargs=()</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="st">while [[ $# -gt 0 ]]; do</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="st">  case "$1" in</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="st">    --bowtie2out|--bowtie2-out)</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="st">      if [[ -n "$2" ]]; then</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="st">        newargs+=("--mapout" "$2")</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="st">        shift 2</span></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a><span class="st">      else</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a><span class="st">        newargs+=("$1")</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a><span class="st">        shift</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a><span class="st">      fi</span></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a><span class="st">      ;;</span></span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a><span class="st">    *)</span></span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a><span class="st">      newargs+=("$1")</span></span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a><span class="st">      shift</span></span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a><span class="st">      ;;</span></span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a><span class="st">  esac</span></span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a><span class="st">done</span></span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a><span class="st">exec "$REAL_METAPHLAN" "${newargs[@]}"</span></span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x metaphlan</span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a><span class="fu">which</span> metaphlan</span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a><span class="ex">metaphlan</span> <span class="at">--help</span> <span class="kw">|</span> <span class="fu">sed</span> <span class="at">-n</span> <span class="st">'1,40p'</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Se recomienda descargar la base de datos de metaphlan:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ex">metaphlan</span> <span class="at">--install</span> <span class="at">--bowtie2db</span> </span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
 </section>
 
 </main>

@@ -780,33 +780,117 @@ ggplot(plot_df, aes(x = sample, y = percent, fill = taxa_plot)) +
   ))
 ```
 
-# HUMAnN 2.0
+# HUMAnN 3.0
 
-Para utilizar [`HUMAnN 2.0`](https://huttenhower.sph.harvard.edu/humann2/) vamos a requerir instalar primero a [`MetaPhlAn 2.0`](https://github.com/biobakery/MetaPhlAn2), estas herramientas también nos permitirán hacer un peril taxonómico de muestras de metagenomica partiendo de los archivos FASTQ.
-
-Vamos a descargar la base de datos que utilizaremos para le perfil taxnómico (`Base de datos filtrada UniRef90 EC`), vamos a utilizar el mismo directorio `2025_metagenomics_direct/dbs`:
+Para utilizar [`HUMAnN 3.0`](https://github.com/biobakery/humann/?tab=readme-ov-file#3-test-the-install) vamos a requerir instalar primero a [`MetaPhlAn`](https://huttenhower.sph.harvard.edu/metaphlan3/), estas herramientas también nos permitirán hacer un peril taxonómico de muestras de metagenomica partiendo de los archivos FASTQ.
 
 ```{bash, eval=FALSE}
-humann2_databases --download uniref uniref90_ec_filtered_diamond ./
+pip install humann
 ```
 
-También necesitamos descargar la base de datos `ChocoPhlAn`:
+Vamos a descargar la base de datos que utilizaremos para le perfil taxonómico (`Base de datos filtrada UniRef90 EC`), vamos a utilizar el mismo directorio `2025_metagenomics_direct/dbs`:
 
 ```{bash, eval=FALSE}
-humann2_databases --download chocophlan full ./
+humann_databases --download uniref uniref90_ec_filtered_diamond ./
+```
+
+También necesitamos descargar la base de datos `ChocoPhlAn` (Este paso toma su tiempo, paciencia):
+
+```{bash, eval=FALSE}
+humann_databases --download chocophlan full ./
 ```
 
 Vamos a descargar las herramientas de mapeo:
 
 ```{bash, eval=FALSE}
-humann2_databases --download utility_mapping full ./
+humann_databases --download utility_mapping full ./
 ```
 
 Ahora si corremos el flujo de trabajo completo:
 
 ```{bash, eval=FALSE}
-humann2 \
+humann \
 --input 1_QC/host_filter/SRR19746202.fastq.gz \
 --output 3_humann2 \
---metaphlan bin/MetaPhlAn2/metaphlan2.py
+--metaphlan bin/MetaPhlAn/metaphlan.py
+```
+
+Ojo, para evitar problemas de compatibilidad usar la siguiente vía de instalación de MetaPhlan, además qué te ayudará a futuro a ejecutar esta herramienta individualmente:
+
+```{bash, eval=FALSE}
+git clone https://github.com/biobakery/MetaPhlAn.git
+cd MetaPhlAn
+pip install .
+```
+
+Descargar las bases de datos correspondientes a MetaPhlan (Necesitarás `~30GB` para este paso, tómate tu tiempo, va a tardar):
+
+```{bash, eval=FALSE}
+metaphlan --install
+```
+
+### Extra: Alternativa con ambientes conda
+
+Para tener compatibilidad de todas las herramientas que utiliza HUMAnN te recomiendo crean un ambiente con `conda` o `mamba`.
+
+```{bash, eval=FALSE}
+mamba create -n humann_env -c conda-forge -c bioconda \
+  humann bowtie2 diamond vsearch metaphlan -y
+```
+
+```{bash, eval=FALSE}
+conda activate humann_env
+pip install humann
+
+humann_config --update database_folders nucleotide dbs/chocophlan
+humann_config --update database_folders protein dbs/uniref
+```
+
+*Extra: para poder lograr una correcta cohersión de versiones y parametros de `metaphlan` se tuvieron que hacer los siguientes ajustes, si usas ambiente conda*:
+
+```{bash, eval=FALSE}
+#| code-fold: true
+#| code-summary: "Correciones a metaphlan"
+
+cd ~/miniconda3/envs/humann_env/bin
+mv metaphlan metaphlan.real
+
+cat > metaphlan <<'EOF'
+#!/usr/bin/env bash
+# Wrapper para compatibilizar llamadas antiguas (--bowtie2out) con MetaPhlAn4 (--mapout)
+
+REAL_METAPHLAN="$(dirname "$0")/metaphlan.real"
+
+newargs=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --bowtie2out|--bowtie2-out)
+      if [[ -n "$2" ]]; then
+        newargs+=("--mapout" "$2")
+        shift 2
+      else
+        newargs+=("$1")
+        shift
+      fi
+      ;;
+    *)
+      newargs+=("$1")
+      shift
+      ;;
+  esac
+done
+
+exec "$REAL_METAPHLAN" "${newargs[@]}"
+EOF
+
+chmod +x metaphlan
+which metaphlan
+metaphlan --help | sed -n '1,40p'
+
+```
+
+Se recomienda descargar la base de datos de metaphlan:
+
+```{bash, eval=FALSE}
+metaphlan --install --bowtie2db 
 ```
